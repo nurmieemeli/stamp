@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  username     String   @unique
+  createdAt    DateTime @default(now())
+  profile      Profile?
+}
+
+model Profile {
+  id           String         @id @default(cuid())
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String         @unique
+  displayName  String
+  eyebrow      String         @default("")
+  bio          String         @default("")
+  bioSecondary String         @default("")
+  trackTitle   String         @default("")
+  avatarUrl    String         @default("")
+  viewCount    Int            @default(0)
+  links        Link[]
+  badges       ProfileBadge[]
+}
+
+model Link {
+  id        String  @id @default(cuid())
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String
+  platform  String
+  value     String
+  order     Int     @default(0)
+
+  @@index([profileId])
+}
+
+model Badge {
+  id       String         @id @default(cuid())
+  key      String         @unique
+  label    String
+  profiles ProfileBadge[]
+}
+
+model ProfileBadge {
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  badgeId   String
+  grantedAt DateTime @default(now())
+
+  @@id([profileId, badgeId])
+  @@index([badgeId])
+}

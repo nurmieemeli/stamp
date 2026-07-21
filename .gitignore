@@ -33,9 +33,26 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local sqlite database — contains real emails and password hashes
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# user-uploaded avatars
+/public/uploads
+
+# auto-fetched agent skill reference docs — not project source
+/.agents
+/.windsurf
+/.claude/skills
+skills-lock.json
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/generated/prisma

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "stamp-dev",
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": ["/c", "C:\\Users\\Administrator\\Desktop\\neux\\.claude\\run-dev.cmd"],
+      "port": 3000
+    }
+  ]
+}
