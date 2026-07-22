@@ -2,7 +2,7 @@
 
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
-import { signIn } from "@/lib/auth";
+import { auth, signIn } from "@/lib/auth";
 import { normalizeUsername, validateUsername, validateCleanText } from "@/lib/validation";
 import { normalizeInviteCode } from "@/lib/invite-code";
 import { generateVerificationCode, VERIFICATION_CODE_TTL_MS } from "@/lib/verification-token";
@@ -16,6 +16,11 @@ export type SignupState = { error: string };
 class InviteCodeError extends Error {}
 
 export async function signupAction(_prev: SignupState, formData: FormData): Promise<SignupState> {
+  const session = await auth();
+  if (session?.user) {
+    return { error: "You're already logged in — log out first to create another account." };
+  }
+
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const username = normalizeUsername(String(formData.get("username") || ""));
   const password = String(formData.get("password") || "");
