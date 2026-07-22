@@ -96,11 +96,11 @@ npm run build
 
 ## 9. Check file permissions
 
-The `stamp` user needs write access to where the SQLite file and avatar uploads live:
+The `stamp` user needs write access to where the SQLite file and avatar uploads live. Avatars are stored in `storage/avatars/` — deliberately outside `public/`, since `next start` doesn't serve files added to `public/` after the server boots (only `next dev` does); they're served through a route handler instead (`app/uploads/avatars/[filename]/route.ts`).
 
 ```bash
-mkdir -p public/uploads/avatars
-chmod -R u+rwX public/uploads
+mkdir -p storage/avatars
+chmod -R u+rwX storage
 ```
 
 If `dev.db` already exists from the migrate step above, it's owned by `stamp` already (you ran the commands as that user) — nothing extra needed.
@@ -188,7 +188,7 @@ crontab -e
 ```
 
 ```cron
-0 3 * * * cp /home/stamp/stamp/dev.db /home/stamp/backups/dev-$(date +\%F).db && tar -czf /home/stamp/backups/uploads-$(date +\%F).tar.gz -C /home/stamp/stamp/public uploads
+0 3 * * * cp /home/stamp/stamp/dev.db /home/stamp/backups/dev-$(date +\%F).db && tar -czf /home/stamp/backups/uploads-$(date +\%F).tar.gz -C /home/stamp/stamp storage
 ```
 
 (Create `/home/stamp/backups` first, and prune old backups periodically so disk doesn't fill up.)
@@ -201,6 +201,6 @@ crontab -e
 | Avatar upload fails with a generic network error, no app-level message | nginx's `client_max_body_size` isn't set high enough — confirm it's in the active config (`10M` in `deploy/nginx.conf.example`) |
 | Login form submits but you're never actually signed in | Site is being served over HTTP, not HTTPS — the session cookie requires `Secure`. Finish step 12 |
 | `UntrustedHost` error in `pm2 logs stamp` | Shouldn't happen — `trustHost: true` is already set in `lib/auth.ts` for exactly this. If you see it, confirm you're running the code from this repo, not an older checkout |
-| `EACCES: permission denied` writing to `dev.db` or `public/uploads` | The process user doesn't own those paths — re-check step 9, or that PM2 is running as the `stamp` user (`pm2 status` shows the user) |
+| `EACCES: permission denied` writing to `dev.db` or `storage` | The process user doesn't own those paths — re-check step 9, or that PM2 is running as the `stamp` user (`pm2 status` shows the user) |
 | Port 3000 already in use | Something else is bound to it — `sudo lsof -i :3000`, or change `PORT` in `ecosystem.config.js` and update the nginx `proxy_pass` to match |
 | `npm run build` fails with `Module not found: Can't resolve '@/app/generated/prisma/client'` | The generated Prisma client is missing — it's gitignored on purpose (it's build output, not source). `npm ci` regenerates it automatically via `postinstall`; if that got skipped, run `npx prisma generate` directly |

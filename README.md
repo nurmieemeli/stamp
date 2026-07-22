@@ -51,7 +51,7 @@ npm test          # unit tests (vitest)
 
 ## Deploying to your own server (nginx + persistent disk)
 
-This only works on a host with a persistent, writable filesystem — SQLite (`dev.db`) and uploaded avatars (`public/uploads/`) both live on disk. It will **not** work as-is on a serverless/ephemeral platform (Vercel, etc.); that needs a hosted Postgres and object storage instead.
+This only works on a host with a persistent, writable filesystem — SQLite (`dev.db`) and uploaded avatars (`storage/avatars/`) both live on disk. It will **not** work as-is on a serverless/ephemeral platform (Vercel, etc.); that needs a hosted Postgres and object storage instead.
 
 Full step-by-step walkthrough (server prep, Node install, PM2, nginx, TLS, backups, troubleshooting): **[DEPLOYMENT.md](DEPLOYMENT.md)**. Quick summary:
 

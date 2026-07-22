@@ -8,15 +8,16 @@ import { revalidatePath } from "next/cache";
 import { auth, signOut } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { isKnownPlatform } from "@/lib/platforms";
+import { AVATAR_DIR } from "@/lib/avatar-storage";
 
-const AVATAR_DIR = path.join(process.cwd(), "public", "uploads", "avatars");
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 const AVATAR_DIMENSION = 800;
 
 async function deleteAvatarFile(avatarUrl: string) {
   if (!avatarUrl) return;
-  const filePath = path.join(process.cwd(), "public", avatarUrl.replace(/^\/+/, ""));
-  await unlink(filePath).catch(() => {});
+  const filename = avatarUrl.split("/").pop();
+  if (!filename) return;
+  await unlink(path.join(AVATAR_DIR, filename)).catch(() => {});
 }
 
 export async function signOutAction() {

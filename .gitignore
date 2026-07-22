@@ -39,8 +39,8 @@ yarn-error.log*
 *.db-wal
 *.db-shm
 
-# user-uploaded avatars
-/public/uploads
+# user-uploaded avatars (outside public/ — see lib/avatar-storage.ts)
+/storage
 
 # auto-fetched agent skill reference docs — not project source
 /.agents
