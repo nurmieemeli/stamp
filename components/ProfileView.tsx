@@ -35,6 +35,14 @@ export function ProfileView({ profile }: { profile: ProfileData }) {
           </div>
         </section>
 
+        {profile.badges.length > 0 ? (
+          <div className="stamps">
+            {profile.badges.map((badge) => (
+              <StampBadge key={badge.key} label={badge.label} />
+            ))}
+          </div>
+        ) : null}
+
         {profile.bio ? <p className="bio">{profile.bio}</p> : null}
 
         <NowSpinning
@@ -62,14 +70,6 @@ export function ProfileView({ profile }: { profile: ProfileData }) {
             <p className="index-empty">No links yet.</p>
           )}
         </nav>
-
-        {profile.badges.length > 0 ? (
-          <div className="stamps">
-            {profile.badges.map((badge) => (
-              <StampBadge key={badge.key} label={badge.label} />
-            ))}
-          </div>
-        ) : null}
       </div>
 
       <footer className="statusbar">
