@@ -115,6 +115,42 @@ select:focus-visible {
   padding: 0 16px 80px;
 }
 
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 20px 16px 32px;
+  border-top: 1px solid var(--line);
+  font-size: 0.75rem;
+  color: var(--text-faint);
+}
+
+.site-footer .wordmark {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.site-footer .wordmark::before {
+  content: "> ";
+  color: var(--accent);
+}
+
+.site-footer .site-footer-meta a {
+  color: var(--text-faint);
+  text-decoration: none;
+}
+
+.site-footer .site-footer-meta a:hover {
+  color: var(--accent);
+}
+
 /* ---- form atoms ---- */
 
 .field {
