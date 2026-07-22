@@ -24,6 +24,16 @@ export function normalizeUsername(input: string): string {
   return input.trim().toLowerCase();
 }
 
+/** Turns free text into a stable identifier, e.g. for a badge key derived from its label. */
+export function slugify(input: string): string {
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+}
+
 export function validateUsername(rawUsername: string): string | null {
   const username = normalizeUsername(rawUsername);
   if (!USERNAME_RE.test(username)) {

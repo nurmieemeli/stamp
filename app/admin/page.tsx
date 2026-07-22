@@ -35,15 +35,21 @@ export default async function AdminPage({
         </Link>
         <nav>
           <Link href="/admin/invites">Invites</Link>
+          <Link href="/admin/badges">Badges</Link>
           <Link href="/dashboard">My page</Link>
         </nav>
       </header>
       <main className="site-main">
         <div className="panel-header-row">
           <h2>Members</h2>
-          <Link href="/admin/invites" className="button-ghost button-small">
-            Manage invites
-          </Link>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Link href="/admin/badges" className="button-ghost button-small">
+              Manage badges
+            </Link>
+            <Link href="/admin/invites" className="button-ghost button-small">
+              Manage invites
+            </Link>
+          </div>
         </div>
         <div className="panel">
           {users.length === 0 ? (

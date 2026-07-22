@@ -915,6 +915,31 @@ select:focus-visible {
   color: var(--accent);
 }
 
+.badge-row-label {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  border-radius: 0;
+  transition: border-color 0.15s ease;
+}
+
+.badge-row-label:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.badge-row-count {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 /* ---- profile window (public page + dashboard live preview) ---- */
 /* Palette tokens (--bg, --surface, --accent, etc.) are overridden inline on
    .window per profile — see lib/palettes.ts + components/ProfileView.tsx. */
