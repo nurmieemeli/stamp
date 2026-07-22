@@ -80,7 +80,6 @@ export default async function PublicProfilePage({ params }: { params: Promise<Pa
     avatarUrl: profile.avatarUrl,
     paletteKey: profile.palette,
     viewCount: alreadySeen ? profile.viewCount : profile.viewCount + 1,
-    joinYear: user.createdAt.getFullYear(),
     badges: profile.badges.map((pb) => ({ key: pb.badge.key, label: pb.badge.label })),
     links: profile.links.map((l) => {
       const url = resolveLinkUrl(l.platform, l.value);

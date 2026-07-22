@@ -45,11 +45,9 @@ function newLinkId() {
 
 export function DashboardEditor({
   username,
-  joinYear,
   initialProfile,
 }: {
   username: string;
-  joinYear: number;
   initialProfile: InitialProfile;
 }) {
   const [displayName, setDisplayName] = useState(initialProfile.displayName);
@@ -114,7 +112,6 @@ export function DashboardEditor({
       avatarUrl: avatarPreview ?? avatarUrl,
       paletteKey,
       viewCount: initialProfile.viewCount,
-      joinYear,
       badges: initialProfile.badges,
       links: links
         .filter((l) => l.value.trim())
@@ -132,7 +129,6 @@ export function DashboardEditor({
       avatarUrl,
       paletteKey,
       links,
-      joinYear,
       initialProfile.viewCount,
       initialProfile.badges,
     ],

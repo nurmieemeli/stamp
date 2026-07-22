@@ -23,7 +23,6 @@ export type ProfileData = {
   avatarUrl: string;
   paletteKey: string;
   viewCount: number;
-  joinYear: number;
   badges: ProfileBadgeView[];
   links: ProfileLink[];
 };

@@ -32,7 +32,6 @@ export function ProfileView({ profile }: { profile: ProfileData }) {
           <div className="identity-meta">
             <p className="id-name">{profile.displayName || profile.username}</p>
             <span className="id-handle">@{profile.username}</span>
-            <p className="id-role">since {profile.joinYear}</p>
           </div>
         </section>
 

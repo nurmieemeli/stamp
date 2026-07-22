@@ -1046,12 +1046,6 @@ select:focus-visible {
   font-size: 0.8125rem;
 }
 
-.id-role {
-  color: var(--text-muted);
-  font-size: 0.8125rem;
-  margin-top: 6px;
-}
-
 .stamps {
   display: flex;
   flex-wrap: wrap;

@@ -46,7 +46,6 @@ export default async function DashboardPage() {
         <h2>Edit your page</h2>
         <DashboardEditor
           username={user.username}
-          joinYear={user.createdAt.getFullYear()}
           initialProfile={{
             displayName: profile.displayName,
             bio: profile.bio,
