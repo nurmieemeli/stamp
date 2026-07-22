@@ -1,13 +1,13 @@
 # Reverse proxy for Stamp (Next.js on port 3000, via PM2/systemd).
 # Copy to /etc/nginx/sites-available/stamp, symlink into sites-enabled,
-# replace your-domain.com, then run: sudo certbot --nginx -d your-domain.com
+# then run: sudo certbot --nginx -d stamp.rip
 # (certbot rewrites this into an HTTPS block automatically — auth won't work
 # without HTTPS, since NextAuth's session cookie is marked Secure in production).
 
 server {
     listen 80;
     listen [::]:80;
-    server_name your-domain.com;
+    server_name stamp.rip;
 
     # Avatar uploads are capped at 8MB server-side (see next.config.ts) —
     # nginx's own 1MB default would reject the upload before Next ever sees it.

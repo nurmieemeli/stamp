@@ -38,7 +38,7 @@ export default async function LandingPage() {
           </p>
           <form className="actions" action="/signup" method="get">
             <div className="claim">
-              <span>stamp.page/</span>
+              <span>stamp.rip/</span>
               <input
                 name="u"
                 placeholder="yourname"

@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return { title: "Not found · Stamp" };
   }
   return {
-    title: `${user.profile.displayName || user.username} · stamp.page`,
+    title: `${user.profile.displayName || user.username} · stamp.rip`,
     description: user.profile.bio || `${user.username}'s page on Stamp.`,
   };
 }

@@ -128,13 +128,13 @@ As your admin (sudo) user, not the `stamp` user:
 
 ```bash
 sudo cp ~stamp/stamp/deploy/nginx.conf.example /etc/nginx/sites-available/stamp
-sudo nano /etc/nginx/sites-available/stamp   # replace your-domain.com with your real domain
+sudo nano /etc/nginx/sites-available/stamp   # confirm server_name is stamp.rip
 sudo ln -s /etc/nginx/sites-available/stamp /etc/nginx/sites-enabled/
 sudo nginx -t                                # test the config before reloading
 sudo systemctl reload nginx
 ```
 
-At this point `http://your-domain.com` should load the site over plain HTTP — but **auth will not work yet** (see next step).
+At this point `http://stamp.rip` should load the site over plain HTTP — but **auth will not work yet** (see next step).
 
 ## 12. Get HTTPS (required before testing login/signup)
 
@@ -142,7 +142,7 @@ NextAuth marks its session cookie `Secure` in production, so it's silently dropp
 
 ```bash
 sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d your-domain.com
+sudo certbot --nginx -d stamp.rip
 ```
 
 Certbot rewrites the nginx config to add the HTTPS block and redirect HTTP → HTTPS automatically. It also sets up auto-renewal (verify with `sudo certbot renew --dry-run`).
@@ -159,7 +159,7 @@ Port 3000 (where Next.js actually listens) is only reachable via `127.0.0.1` thr
 
 ## 14. Verify the deployment
 
-- [ ] `https://your-domain.com` loads the landing page, padlock shows valid HTTPS
+- [ ] `https://stamp.rip` loads the landing page, padlock shows valid HTTPS
 - [ ] Sign up for a new account, confirm you land on `/dashboard` logged in
 - [ ] Log out, log back in
 - [ ] Edit profile fields and links, save, confirm the public `/username` page reflects them

@@ -61,7 +61,7 @@ export default function SignupPage() {
     <div className="auth-shell">
       <div className="auth-card">
         <h1>Claim your page</h1>
-        <p className="lede">stamp.page/yourname — yours in under a minute.</p>
+        <p className="lede">stamp.rip/yourname — yours in under a minute.</p>
         <Suspense fallback={null}>
           <SignupForm />
         </Suspense>

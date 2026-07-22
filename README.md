@@ -13,7 +13,7 @@ Create `.env` (see `.env` in the repo for the current local values):
 ```
 DATABASE_URL="file:./dev.db"
 AUTH_SECRET="<random secret — regenerate before any real deployment>"
-ADMIN_EMAILS="admin@stamp.page"   # comma-separated; these accounts get access to /admin
+ADMIN_EMAILS="admin@stamp.rip"   # comma-separated; these accounts get access to /admin
 ```
 
 Set up the database:
@@ -65,7 +65,7 @@ npx tsx prisma/seed.ts
 npm run build
 pm2 start ecosystem.config.js && pm2 save
 # copy deploy/nginx.conf.example into place, then:
-sudo certbot --nginx -d your-domain.com
+sudo certbot --nginx -d stamp.rip
 ```
 
 Auth won't work without HTTPS (the session cookie is marked `Secure` in production), so get the certificate before testing login.
