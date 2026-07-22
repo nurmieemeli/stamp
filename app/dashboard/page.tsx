@@ -22,6 +22,7 @@ export default async function DashboardPage() {
   ]);
 
   if (!user || !profile) redirect("/login");
+  if (!user.emailVerifiedAt) redirect("/verify-email");
 
   return (
     <>

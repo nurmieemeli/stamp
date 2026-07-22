@@ -78,9 +78,10 @@ ADMIN_EMAILS="you@example.com"
 NEXT_PUBLIC_TURNSTILE_SITE_KEY="your-turnstile-site-key"
 TURNSTILE_SECRET_KEY="your-turnstile-secret-key"
 
-# Required for the admin "Send password reset" button to actually deliver
-# email. Get an API key at resend.com and verify stamp.rip as a sending
-# domain there (Resend walks you through the DNS records).
+# Required — signup emails every new account a verification code before
+# their dashboard unlocks, and the admin "Send password reset" button
+# needs it too. Get an API key at resend.com and verify stamp.rip as a
+# sending domain there (Resend walks you through the DNS records).
 RESEND_API_KEY="your-resend-api-key"
 RESEND_FROM_EMAIL="Stamp <noreply@stamp.rip>"
 ```
@@ -93,13 +94,13 @@ openssl rand -base64 32
 
 **Don't reuse the `AUTH_SECRET` from local development** — it's a shared dev value, not a real secret.
 
-Turnstile and Resend are both optional at this step — the CAPTCHA and reset-email features degrade gracefully without them (see Known gaps in README.md), so you can come back and fill these in once the Cloudflare/Resend accounts are set up rather than blocking the rest of the deploy on them.
+Turnstile is optional at this step — the CAPTCHA degrades gracefully without it (see Known gaps in README.md). Resend is **not** optional this time: signup is invite-only *and* requires a working verification email, so without `RESEND_API_KEY` configured nobody — including you — can create an account. Set it up before moving on.
 
 ## 7. Set up the database
 
 ```bash
 npx prisma migrate deploy    # applies migrations, no prompts, no shadow DB
-npx tsx prisma/seed.ts       # seeds the badge catalog (Founding Member, Verified, etc.)
+npx tsx prisma/seed.ts       # seeds the badge catalog + prints a bootstrap invite code — save it
 ```
 
 ## 8. Build for production
@@ -174,7 +175,7 @@ Port 3000 (where Next.js actually listens) is only reachable via `127.0.0.1` thr
 ## 14. Verify the deployment
 
 - [ ] `https://stamp.rip` loads the landing page, padlock shows valid HTTPS
-- [ ] Sign up for a new account, confirm you land on `/dashboard` logged in
+- [ ] Sign up using the invite code the seed script printed in step 7, confirm the verification email arrives and entering its code unlocks `/dashboard`
 - [ ] Log out, log back in
 - [ ] Edit profile fields and links, save, confirm the public `/username` page reflects them
 - [ ] Upload an avatar, confirm it shows on both the dashboard preview and the public page
@@ -220,3 +221,5 @@ crontab -e
 | `npm run build` fails with `Module not found: Can't resolve '@/app/generated/prisma/client'` | The generated Prisma client is missing — it's gitignored on purpose (it's build output, not source). `npm ci` regenerates it automatically via `postinstall`; if that got skipped, run `npx prisma generate` directly |
 | Login/signup show "Verification failed" for real users | `TURNSTILE_SITE_KEY`/`TURNSTILE_SECRET_KEY` don't match the same Turnstile widget in your Cloudflare dashboard, or the domain the widget is scoped to doesn't match `stamp.rip` |
 | Admin's "Send password reset" shows "Couldn't send the email" | `RESEND_API_KEY` is missing/invalid, or `RESEND_FROM_EMAIL`'s domain isn't verified in Resend yet — check `pm2 logs stamp` for the underlying Resend error |
+| Signup shows "Couldn't send your verification email" for everyone | Same Resend misconfiguration as above — nobody can sign up until it's fixed, since the account is rolled back rather than left unverifiable. Check `pm2 logs stamp` |
+| No invite codes to give out / lost the bootstrap one | Log in as an admin (an `ADMIN_EMAILS` account created before this feature, or restore one) and generate more from `/admin/invites`. If there are truly zero accounts, re-run `npx tsx prisma/seed.ts` — it only mints a bootstrap code when none exist yet, so this is safe to run again |

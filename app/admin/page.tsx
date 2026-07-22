@@ -21,11 +21,17 @@ export default async function AdminPage() {
           Stamp
         </Link>
         <nav>
+          <Link href="/admin/invites">Invites</Link>
           <Link href="/dashboard">My page</Link>
         </nav>
       </header>
       <main className="site-main">
-        <h2>Members</h2>
+        <div className="panel-header-row">
+          <h2>Members</h2>
+          <Link href="/admin/invites" className="button-ghost button-small">
+            Manage invites
+          </Link>
+        </div>
         <div className="panel">
           {users.length === 0 ? (
             <p className="hint">No members yet.</p>

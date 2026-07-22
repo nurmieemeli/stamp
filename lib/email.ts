@@ -103,6 +103,81 @@ function buildResetEmailText(params: { displayName: string; resetUrl: string; re
   return `Hi ${params.displayName},\n\n${intro}\n\nSet a new password here: ${params.resetUrl}\n\nThis link expires in one hour and works once. If you didn't expect this, you can ignore it — your password stays the same until you open the link above.`;
 }
 
+function buildVerificationEmailHtml(params: { displayName: string; code: string }): string {
+  const name = escapeHtml(params.displayName);
+  const spacedCode = params.code.split("").join(" ");
+
+  return `<!doctype html>
+<html>
+  <body style="margin:0;padding:0;background:#0b0c0d;font-family:${MONO_STACK};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0b0c0d;padding:40px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:480px;max-width:100%;background:#17181b;border:1px solid #2a2c30;">
+            <tr>
+              <td style="padding:20px 28px;border-bottom:1px solid #2a2c30;">
+                <span style="color:#e8a33d;font-size:13px;">&gt;</span>
+                <span style="color:#e4e1d8;font-size:13px;font-weight:700;letter-spacing:0.02em;"> Stamp</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:32px 28px 0;text-align:center;">
+                <p style="margin:0 0 6px;color:#e4e1d8;font-size:15px;font-weight:700;">Hi ${name},</p>
+                <p style="margin:0;color:#82858c;font-size:13px;line-height:1.6;">
+                  Confirm this is your email address by entering the code below.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px 28px;text-align:center;">
+                <span style="display:inline-block;background:#0f1012;border:1px solid #2a2c30;color:#e8a33d;font-size:28px;font-weight:700;letter-spacing:6px;padding:16px 20px;">${spacedCode}</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:0 28px 28px;text-align:center;">
+                <p style="margin:0;color:#52555c;font-size:11px;line-height:1.6;">
+                  This code expires in 30 minutes and works once. If you didn&rsquo;t sign up for Stamp, you can
+                  ignore this email.
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 28px;border-top:1px solid #2a2c30;text-align:center;">
+                <p style="margin:0;color:#52555c;font-size:10px;letter-spacing:0.04em;text-transform:uppercase;">stamp.rip</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+function buildVerificationEmailText(params: { displayName: string; code: string }): string {
+  return `Hi ${params.displayName},\n\nConfirm this is your email address by entering this code on Stamp: ${params.code}\n\nThis code expires in 30 minutes and works once. If you didn't sign up for Stamp, you can ignore this email.`;
+}
+
+export async function sendVerificationEmail(params: { to: string; displayName: string; code: string }): Promise<void> {
+  if (!resend) {
+    throw new Error("Email sending isn't configured (missing RESEND_API_KEY).");
+  }
+
+  const displayName = params.displayName.trim() || params.to.split("@")[0];
+
+  const { error } = await resend.emails.send({
+    from: FROM,
+    to: params.to,
+    subject: `${params.code} is your Stamp verification code`,
+    html: buildVerificationEmailHtml({ displayName, code: params.code }),
+    text: buildVerificationEmailText({ displayName, code: params.code }),
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function sendPasswordResetEmail(params: {
   to: string;
   resetUrl: string;

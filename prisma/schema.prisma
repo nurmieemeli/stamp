@@ -13,13 +13,19 @@ datasource db {
 }
 
 model User {
-  id                   String                @id @default(cuid())
-  email                String                @unique
-  passwordHash         String
-  username             String                @unique
-  createdAt            DateTime              @default(now())
-  profile              Profile?
-  passwordResetTokens  PasswordResetToken[]
+  id                      String                    @id @default(cuid())
+  email                   String                    @unique
+  passwordHash            String
+  username                String                    @unique
+  createdAt               DateTime                  @default(now())
+  // No column-level default (SQLite disallows non-constant defaults on
+  // ADD COLUMN) — the migration backfills existing rows to now() directly,
+  // and every db.user.create() call explicitly sets this field.
+  emailVerifiedAt         DateTime?
+  profile                 Profile?
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  invitesUsed             InviteCode[]              @relation("InviteCodeUser")
 }
 
 model PasswordResetToken {
@@ -32,6 +38,30 @@ model PasswordResetToken {
   createdAt DateTime  @default(now())
 
   @@index([userId])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  codeHash  String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model InviteCode {
+  id             String    @id @default(cuid())
+  code           String    @unique
+  createdByEmail String
+  createdAt      DateTime  @default(now())
+  usedAt         DateTime?
+  usedByUserId   String?
+  usedByUser     User?     @relation("InviteCodeUser", fields: [usedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([usedByUserId])
 }
 
 model Profile {

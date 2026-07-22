@@ -40,6 +40,7 @@ describe("validateUsername", () => {
     expect(validateUsername("dashboard")).not.toBeNull();
     expect(validateUsername("reset-password")).not.toBeNull();
     expect(validateUsername("forgot-password")).not.toBeNull();
+    expect(validateUsername("verify-email")).not.toBeNull();
   });
 
   it("rejects handles containing slurs or profanity", () => {

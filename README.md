@@ -20,10 +20,12 @@ ADMIN_EMAILS="admin@stamp.rip"   # comma-separated; these accounts get access to
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=""
 TURNSTILE_SECRET_KEY=""
 
-# Required for admin-triggered password reset emails to actually send.
-# Get an API key at resend.com; RESEND_FROM_EMAIL needs a domain verified
-# there (falls back to Resend's shared onboarding@resend.dev sender if unset,
-# which is fine for testing but shouldn't be used in production).
+# Required — signup emails every new account a verification code before
+# their dashboard unlocks, so without this nobody can actually finish
+# signing up. Also used for password reset emails. Get an API key at
+# resend.com; RESEND_FROM_EMAIL needs a domain verified there (falls back
+# to Resend's shared onboarding@resend.dev sender if unset, which is fine
+# for local testing but shouldn't be used in production).
 RESEND_API_KEY=""
 RESEND_FROM_EMAIL="Stamp <noreply@stamp.rip>"
 ```
@@ -32,8 +34,10 @@ Set up the database:
 
 ```bash
 npx prisma migrate dev
-npx tsx prisma/seed.ts   # seeds the badge catalog
+npx tsx prisma/seed.ts   # seeds the badge catalog + a bootstrap invite code
 ```
+
+Signup is invite-only (see Project shape below) — the seed command above prints a one-time invite code to the console the first time it runs, since a fresh database has no members yet to hand one out. Use that code for your first signup, then generate more from `/admin/invites` once you're in.
 
 Run the dev server:
 
@@ -44,10 +48,13 @@ npm run dev
 ## Project shape
 
 - `/` — landing page
-- `/signup`, `/login` — credentials auth
-- `/dashboard` — the logged-in member's editor (identity, links, badges are read-only here)
+- `/signup` — invite-only: requires a valid unused invite code, then emails a 6-digit verification code before the account can be used
+- `/verify-email` — where a freshly signed-up member enters that code; the dashboard redirects here until it's done
+- `/login` — credentials auth
+- `/dashboard` — the logged-in member's editor (identity, links, badges are read-only here) — inaccessible until email verification is complete
 - `/[username]` — public profile page
 - `/admin`, `/admin/[username]` — member account/profile editing, badge grants, triggering password reset emails, and deleting accounts, gated by `ADMIN_EMAILS`
+- `/admin/invites` — generate invite codes and see which are used/unused/by whom
 - `/forgot-password` — self-service: a member requests their own reset link by email
 - `/reset-password/[token]` — where a member lands after a reset email (self-requested or admin-triggered); sets a new password
 - `lib/platforms.ts` — the fixed catalog of link platforms and how each one's URL is built from a handle
@@ -75,7 +82,7 @@ git clone <your-repo> && cd <your-repo>
 npm ci
 # .env with a freshly generated AUTH_SECRET — see DEPLOYMENT.md step 6
 npx prisma migrate deploy
-npx tsx prisma/seed.ts
+npx tsx prisma/seed.ts   # prints a bootstrap invite code — save it, you'll need it
 npm run build
 pm2 start ecosystem.config.js && pm2 save
 # copy deploy/nginx.conf.example into place, then:
@@ -86,4 +93,4 @@ Auth won't work without HTTPS (the session cookie is marked `Secure` in producti
 
 ## Known gaps
 
-This is an early-stage build. Not yet handled: audio file uploads (the "now spinning" field is text-only), OAuth login, an owner-facing analytics dashboard beyond the raw view count, and pagination on `/admin`'s member list. Rate limiting on auth is a simple in-memory limiter (`lib/rate-limit.ts`) — fine for a single process, not for a multi-instance deployment. Avatar/database storage is local disk — back it up yourself; there's no managed persistence. Password reset tokens are single-use and expire after an hour but existing logged-in sessions aren't revoked on reset (JWT sessions are stateless, so there's nothing server-side to invalidate). Deleting a member from `/admin` is permanent and immediate — no soft-delete or recovery window.
+This is an early-stage build. Not yet handled: audio file uploads (the "now spinning" field is text-only), OAuth login, an owner-facing analytics dashboard beyond the raw view count, and pagination on `/admin`'s member list. Rate limiting on auth is a simple in-memory limiter (`lib/rate-limit.ts`) — fine for a single process, not for a multi-instance deployment. Avatar/database storage is local disk — back it up yourself; there's no managed persistence. Password reset tokens are single-use and expire after an hour but existing logged-in sessions aren't revoked on reset (JWT sessions are stateless, so there's nothing server-side to invalidate). Deleting a member from `/admin` is permanent and immediate — no soft-delete or recovery window. Invite codes never expire (only single-use); email verification codes expire after 30 minutes but a member can request a new one from `/verify-email` any time. If `RESEND_API_KEY` isn't configured, signup fails outright rather than creating an unverifiable account — set it up before expecting signups to work at all, not just password reset.

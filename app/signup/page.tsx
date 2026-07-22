@@ -16,6 +16,20 @@ function SignupForm() {
   return (
     <form action={formAction}>
       <div className="field">
+        <label htmlFor="inviteCode">Invite code</label>
+        <input
+          id="inviteCode"
+          name="inviteCode"
+          type="text"
+          placeholder="XXXXX-XXXXX"
+          required
+          autoComplete="off"
+          autoCapitalize="characters"
+          style={{ textTransform: "uppercase" }}
+        />
+        <span className="hint">Stamp is invite-only right now — ask a member or admin for a code.</span>
+      </div>
+      <div className="field">
         <label htmlFor="username">Handle</label>
         <input
           id="username"
