@@ -4,14 +4,27 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { isAdminEmail } from "@/lib/admin";
 
-export default async function AdminPage() {
+const PAGE_SIZE = 25;
+
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const session = await auth();
   if (!session?.user || !isAdminEmail(session.user.email)) redirect("/");
+
+  const { page: pageParam } = await searchParams;
+  const totalCount = await db.user.count();
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const page = Math.min(Math.max(1, Number(pageParam) || 1), totalPages);
 
   const users = await db.user.findMany({
     orderBy: { createdAt: "desc" },
     omit: { passwordHash: true },
     include: { profile: { include: { badges: { include: { badge: true } } } } },
+    skip: (page - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
   });
 
   return (
@@ -49,6 +62,27 @@ export default async function AdminPage() {
             ))
           )}
         </div>
+        {totalPages > 1 ? (
+          <div className="pagination">
+            {page > 1 ? (
+              <Link href={`/admin?page=${page - 1}`} className="button-ghost button-small">
+                Previous
+              </Link>
+            ) : (
+              <span className="button-ghost button-small is-disabled">Previous</span>
+            )}
+            <span className="pagination-status">
+              Page {page} of {totalPages} &middot; {totalCount} member{totalCount === 1 ? "" : "s"}
+            </span>
+            {page < totalPages ? (
+              <Link href={`/admin?page=${page + 1}`} className="button-ghost button-small">
+                Next
+              </Link>
+            ) : (
+              <span className="button-ghost button-small is-disabled">Next</span>
+            )}
+          </div>
+        ) : null}
       </main>
     </>
   );

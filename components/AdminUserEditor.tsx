@@ -12,7 +12,6 @@ type InitialUser = {
   eyebrow: string;
   bio: string;
   bioSecondary: string;
-  trackTitle: string;
   palette: string;
 };
 
@@ -24,7 +23,6 @@ export function AdminUserEditor({ initialUser }: { initialUser: InitialUser }) {
   const [eyebrow, setEyebrow] = useState(initialUser.eyebrow);
   const [bio, setBio] = useState(initialUser.bio);
   const [bioSecondary, setBioSecondary] = useState(initialUser.bioSecondary);
-  const [trackTitle, setTrackTitle] = useState(initialUser.trackTitle);
   const [palette, setPalette] = useState(initialUser.palette);
 
   const [isPending, startTransition] = useTransition();
@@ -40,7 +38,6 @@ export function AdminUserEditor({ initialUser }: { initialUser: InitialUser }) {
         eyebrow,
         bio,
         bioSecondary,
-        trackTitle,
         palette,
       });
       setStatus(result);
@@ -80,10 +77,6 @@ export function AdminUserEditor({ initialUser }: { initialUser: InitialUser }) {
       <div className="field">
         <label htmlFor="admin-bioSecondary">Bio, line two</label>
         <textarea id="admin-bioSecondary" value={bioSecondary} onChange={(e) => setBioSecondary(e.target.value)} />
-      </div>
-      <div className="field">
-        <label htmlFor="admin-trackTitle">Now spinning</label>
-        <input id="admin-trackTitle" value={trackTitle} onChange={(e) => setTrackTitle(e.target.value)} />
       </div>
       <div className="field">
         <label htmlFor="admin-palette">Palette</label>

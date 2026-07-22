@@ -48,7 +48,6 @@ export default async function AdminUserPage({ params }: { params: Promise<Params
             eyebrow: user.profile.eyebrow,
             bio: user.profile.bio,
             bioSecondary: user.profile.bioSecondary,
-            trackTitle: user.profile.trackTitle,
             palette: user.profile.palette,
           }}
         />

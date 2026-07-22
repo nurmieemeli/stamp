@@ -46,7 +46,13 @@ export function ProfileView({ profile }: { profile: ProfileData }) {
         {profile.bio ? <p className="bio">{profile.bio}</p> : null}
         {profile.bioSecondary ? <p className="bio">{profile.bioSecondary}</p> : null}
 
-        <NowSpinning trackTitle={profile.trackTitle} />
+        <NowSpinning
+          trackTitle={profile.trackTitle}
+          trackArtist={profile.trackArtist}
+          trackPreviewUrl={profile.trackPreviewUrl}
+          trackArtworkUrl={profile.trackArtworkUrl}
+          trackUrl={profile.trackUrl}
+        />
 
         <nav className="index" aria-label="Links">
           <p className="index-head">Links</p>

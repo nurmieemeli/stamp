@@ -54,7 +54,6 @@ export type AdminUserUpdatePayload = {
   eyebrow: string;
   bio: string;
   bioSecondary: string;
-  trackTitle: string;
   palette: string;
 };
 
@@ -92,7 +91,6 @@ export async function updateUserDetailsAction(payload: AdminUserUpdatePayload): 
     ["Role / location", payload.eyebrow],
     ["Bio", payload.bio],
     ["Bio, line two", payload.bioSecondary],
-    ["Now spinning", payload.trackTitle],
   ];
   for (const [label, value] of textFields) {
     const textError = validateCleanText(label, value);
@@ -114,7 +112,6 @@ export async function updateUserDetailsAction(payload: AdminUserUpdatePayload): 
           eyebrow: payload.eyebrow.trim(),
           bio: payload.bio.trim(),
           bioSecondary: payload.bioSecondary.trim(),
-          trackTitle: payload.trackTitle.trim(),
           palette,
         },
       }),

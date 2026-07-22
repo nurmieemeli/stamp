@@ -45,3 +45,18 @@ export function validateCleanText(label: string, value: string): string | null {
   }
   return null;
 }
+
+/**
+ * True for an empty string (field is optional) or a well-formed https URL.
+ * Used to sanity-check now-playing preview/artwork/track URLs before they're
+ * stored — the dashboard only ever submits URLs that came back from a real
+ * search, but a direct server-action call could submit anything.
+ */
+export function isHttpsUrl(value: string): boolean {
+  if (!value) return true;
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { cache } from "react";
 import { after } from "next/server";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { ProfileView } from "@/components/ProfileView";
@@ -9,6 +10,11 @@ import { getPalette } from "@/lib/palettes";
 import type { ProfileData } from "@/lib/types";
 
 type Params = { username: string };
+
+// How long a "seen this profile" cookie counts as still-the-same-visit for
+// view-count purposes — refreshing (or browsing away and back) within this
+// window doesn't add another view.
+const SEEN_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24;
 
 const loadProfile = cache(async (username: string) => {
   return db.user.findUnique({
@@ -45,13 +51,22 @@ export default async function PublicProfilePage({ params }: { params: Promise<Pa
 
   const profile = user.profile;
 
+  // A visitor who already has this cookie was counted within the last 24h —
+  // refreshing or re-visiting shouldn't inflate the count. The cookie itself
+  // is (re)set client-side below, since Server Components can only read
+  // cookies, not write them.
+  const seenCookieName = `stamp_seen_${profile.id}`;
+  const alreadySeen = (await cookies()).has(seenCookieName);
+
   // Count the view without making every visitor wait on a SQLite write.
-  after(async () => {
-    await db.profile.update({
-      where: { id: profile.id },
-      data: { viewCount: { increment: 1 } },
+  if (!alreadySeen) {
+    after(async () => {
+      await db.profile.update({
+        where: { id: profile.id },
+        data: { viewCount: { increment: 1 } },
+      });
     });
-  });
+  }
 
   const profileData: ProfileData = {
     username: user.username,
@@ -60,9 +75,13 @@ export default async function PublicProfilePage({ params }: { params: Promise<Pa
     bio: profile.bio,
     bioSecondary: profile.bioSecondary,
     trackTitle: profile.trackTitle,
+    trackArtist: profile.trackArtist,
+    trackPreviewUrl: profile.trackPreviewUrl,
+    trackArtworkUrl: profile.trackArtworkUrl,
+    trackUrl: profile.trackUrl,
     avatarUrl: profile.avatarUrl,
     paletteKey: profile.palette,
-    viewCount: profile.viewCount + 1,
+    viewCount: alreadySeen ? profile.viewCount : profile.viewCount + 1,
     joinYear: user.createdAt.getFullYear(),
     badges: profile.badges.map((pb) => ({ key: pb.badge.key, label: pb.badge.label })),
     links: profile.links.map((l) => {
@@ -76,6 +95,15 @@ export default async function PublicProfilePage({ params }: { params: Promise<Pa
   return (
     <div className="profile-page" style={{ background: pageBg }}>
       <ProfileView profile={profileData} />
+      <script
+        // Refreshes the seen-cookie's expiry on every visit (sliding 24h
+        // window) regardless of whether this request counted as a new view.
+        dangerouslySetInnerHTML={{
+          __html: `document.cookie = ${JSON.stringify(
+            `${seenCookieName}=1; max-age=${SEEN_COOKIE_MAX_AGE_SECONDS}; path=/; SameSite=Lax`,
+          )};`,
+        }}
+      />
     </div>
   );
 }

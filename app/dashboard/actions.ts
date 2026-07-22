@@ -10,7 +10,9 @@ import { db } from "@/lib/db";
 import { isKnownPlatform } from "@/lib/platforms";
 import { isValidPalette, DEFAULT_PALETTE } from "@/lib/palettes";
 import { AVATAR_DIR, deleteAvatarFile } from "@/lib/avatar-storage";
-import { validateCleanText } from "@/lib/validation";
+import { validateCleanText, isHttpsUrl } from "@/lib/validation";
+import { searchTracks, type TrackResult } from "@/lib/music-search";
+import { rateLimit } from "@/lib/rate-limit";
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 const AVATAR_DIMENSION = 800;
@@ -25,6 +27,10 @@ export type SaveProfilePayload = {
   bio: string;
   bioSecondary: string;
   trackTitle: string;
+  trackArtist: string;
+  trackPreviewUrl: string;
+  trackArtworkUrl: string;
+  trackUrl: string;
   palette: string;
   links: { platform: string; value: string }[];
 };
@@ -59,6 +65,14 @@ export async function saveProfileAction(payload: SaveProfilePayload): Promise<Sa
     if (error) return { error, savedAt: null };
   }
 
+  // The dashboard only ever submits URLs that came back from a real search
+  // (lib/music-search.ts), but a direct server-action call could submit
+  // anything — reject anything that isn't a plain https URL (or empty).
+  const trackUrls = [payload.trackPreviewUrl, payload.trackArtworkUrl, payload.trackUrl];
+  if (trackUrls.some((url) => !isHttpsUrl(url))) {
+    return { error: "Now playing data looks invalid — try searching again.", savedAt: null };
+  }
+
   const palette = isValidPalette(payload.palette) ? payload.palette : DEFAULT_PALETTE;
 
   const userId = session.user.id;
@@ -72,6 +86,10 @@ export async function saveProfileAction(payload: SaveProfilePayload): Promise<Sa
         bio: payload.bio.trim(),
         bioSecondary: payload.bioSecondary.trim(),
         trackTitle: payload.trackTitle.trim(),
+        trackArtist: payload.trackArtist.trim(),
+        trackPreviewUrl: payload.trackPreviewUrl.trim(),
+        trackArtworkUrl: payload.trackArtworkUrl.trim(),
+        trackUrl: payload.trackUrl.trim(),
         palette,
       },
     });
@@ -155,4 +173,30 @@ export async function removeAvatarAction(): Promise<AvatarState> {
   revalidatePath("/dashboard");
 
   return { error: "", avatarUrl: "" };
+}
+
+export type TrackSearchState = { error: string; results: TrackResult[] };
+
+export async function searchTracksAction(query: string): Promise<TrackSearchState> {
+  const session = await auth();
+  if (!session?.user) {
+    return { error: "Your session expired. Please log in again.", results: [] };
+  }
+
+  const trimmed = query.trim();
+  if (trimmed.length < 2) {
+    return { error: "", results: [] };
+  }
+
+  if (!rateLimit(`track-search:user:${session.user.id}`, 30, 60 * 1000)) {
+    return { error: "Too many searches — slow down a bit.", results: [] };
+  }
+
+  try {
+    const results = await searchTracks(trimmed);
+    return { error: "", results };
+  } catch (err) {
+    console.error("track search failed", err);
+    return { error: "Search failed. Try again.", results: [] };
+  }
 }

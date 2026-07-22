@@ -18,6 +18,10 @@ export type ProfileData = {
   bio: string;
   bioSecondary: string;
   trackTitle: string;
+  trackArtist: string;
+  trackPreviewUrl: string;
+  trackArtworkUrl: string;
+  trackUrl: string;
   avatarUrl: string;
   paletteKey: string;
   viewCount: number;

@@ -1,21 +1,24 @@
 "use client";
 
-import { useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { ProfileView } from "@/components/ProfileView";
 import {
   saveProfileAction,
   uploadAvatarAction,
   removeAvatarAction,
+  searchTracksAction,
   type SaveProfilePayload,
   type SaveState,
   type AvatarState,
 } from "@/app/dashboard/actions";
 import { PLATFORMS, getPlatform, getPlatformLabel, resolveLinkUrl, displayUrl } from "@/lib/platforms";
 import { PALETTES, DEFAULT_PALETTE } from "@/lib/palettes";
+import type { TrackResult } from "@/lib/music-search";
 import type { ProfileData } from "@/lib/types";
 
 const MAX_AVATAR_BYTES = 8 * 1024 * 1024;
 const ACCEPTED_AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const TRACK_SEARCH_DEBOUNCE_MS = 400;
 
 type EditableLink = { id: string; platform: string; value: string };
 
@@ -25,6 +28,10 @@ type InitialProfile = {
   bio: string;
   bioSecondary: string;
   trackTitle: string;
+  trackArtist: string;
+  trackPreviewUrl: string;
+  trackArtworkUrl: string;
+  trackUrl: string;
   avatarUrl: string;
   palette: string;
   viewCount: number;
@@ -51,7 +58,21 @@ export function DashboardEditor({
   const [eyebrow, setEyebrow] = useState(initialProfile.eyebrow);
   const [bio, setBio] = useState(initialProfile.bio);
   const [bioSecondary, setBioSecondary] = useState(initialProfile.bioSecondary);
-  const [trackTitle, setTrackTitle] = useState(initialProfile.trackTitle);
+  const [selectedTrack, setSelectedTrack] = useState<TrackResult | null>(
+    initialProfile.trackTitle
+      ? {
+          title: initialProfile.trackTitle,
+          artist: initialProfile.trackArtist,
+          previewUrl: initialProfile.trackPreviewUrl,
+          artworkUrl: initialProfile.trackArtworkUrl,
+          trackUrl: initialProfile.trackUrl,
+        }
+      : null,
+  );
+  const [trackQuery, setTrackQuery] = useState("");
+  const [trackResults, setTrackResults] = useState<TrackResult[]>([]);
+  const [trackSearchError, setTrackSearchError] = useState("");
+  const [isSearchingTrack, startTrackSearch] = useTransition();
   const [links, setLinks] = useState<EditableLink[]>(initialProfile.links);
   const [avatarUrl, setAvatarUrl] = useState(initialProfile.avatarUrl);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -63,6 +84,27 @@ export function DashboardEditor({
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<SaveState>({ error: "", savedAt: null });
 
+  useEffect(() => {
+    const query = trackQuery.trim();
+    if (query.length < 2) {
+      return;
+    }
+    const handle = setTimeout(() => {
+      startTrackSearch(async () => {
+        const result = await searchTracksAction(query);
+        setTrackSearchError(result.error);
+        setTrackResults(result.results);
+      });
+    }, TRACK_SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(handle);
+  }, [trackQuery]);
+
+  function selectTrack(track: TrackResult) {
+    setSelectedTrack(track);
+    setTrackQuery("");
+    setTrackResults([]);
+  }
+
   const previewProfile: ProfileData = useMemo(
     () => ({
       username,
@@ -70,7 +112,11 @@ export function DashboardEditor({
       eyebrow,
       bio,
       bioSecondary,
-      trackTitle,
+      trackTitle: selectedTrack?.title ?? "",
+      trackArtist: selectedTrack?.artist ?? "",
+      trackPreviewUrl: selectedTrack?.previewUrl ?? "",
+      trackArtworkUrl: selectedTrack?.artworkUrl ?? "",
+      trackUrl: selectedTrack?.trackUrl ?? "",
       avatarUrl: avatarPreview ?? avatarUrl,
       paletteKey,
       viewCount: initialProfile.viewCount,
@@ -89,7 +135,7 @@ export function DashboardEditor({
       eyebrow,
       bio,
       bioSecondary,
-      trackTitle,
+      selectedTrack,
       avatarPreview,
       avatarUrl,
       paletteKey,
@@ -161,7 +207,11 @@ export function DashboardEditor({
       eyebrow,
       bio,
       bioSecondary,
-      trackTitle,
+      trackTitle: selectedTrack?.title ?? "",
+      trackArtist: selectedTrack?.artist ?? "",
+      trackPreviewUrl: selectedTrack?.previewUrl ?? "",
+      trackArtworkUrl: selectedTrack?.artworkUrl ?? "",
+      trackUrl: selectedTrack?.trackUrl ?? "",
       palette: paletteKey,
       links: links.map((l) => ({ platform: l.platform, value: l.value })),
     };
@@ -269,15 +319,65 @@ export function DashboardEditor({
               onChange={(e) => setBioSecondary(e.target.value)}
             />
           </div>
+        </div>
+
+        <div className="panel">
+          <p className="panel-title">Now playing</p>
+          {selectedTrack ? (
+            <div className="track-selected">
+              {selectedTrack.artworkUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- small external thumbnail
+                <img src={selectedTrack.artworkUrl} alt="" className="track-selected-art" />
+              ) : null}
+              <div className="track-selected-meta">
+                <p className="track-selected-title">{selectedTrack.title}</p>
+                <p className="track-selected-artist">{selectedTrack.artist}</p>
+              </div>
+              <button
+                type="button"
+                className="button-ghost button-small"
+                onClick={() => setSelectedTrack(null)}
+              >
+                Clear
+              </button>
+            </div>
+          ) : null}
           <div className="field">
-            <label htmlFor="trackTitle">Now spinning (optional)</label>
+            <label htmlFor="trackQuery">{selectedTrack ? "Change track" : "Search for a song"}</label>
             <input
-              id="trackTitle"
-              value={trackTitle}
-              onChange={(e) => setTrackTitle(e.target.value)}
-              placeholder="Coastal Static — Side A, Tape 14"
+              id="trackQuery"
+              value={trackQuery}
+              onChange={(e) => setTrackQuery(e.target.value)}
+              placeholder="Song or artist name"
+              autoComplete="off"
             />
+            <span className="hint">Pulled from Apple Music — includes a 30-second preview.</span>
           </div>
+          {isSearchingTrack ? <p className="hint">Searching…</p> : null}
+          {trackSearchError && trackQuery.trim().length >= 2 ? (
+            <p className="field-error">{trackSearchError}</p>
+          ) : null}
+          {trackResults.length > 0 && trackQuery.trim().length >= 2 ? (
+            <div className="track-results">
+              {trackResults.map((track, i) => (
+                <button
+                  type="button"
+                  key={`${track.title}-${track.artist}-${i}`}
+                  className="track-result"
+                  onClick={() => selectTrack(track)}
+                >
+                  {track.artworkUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- small external thumbnail
+                    <img src={track.artworkUrl} alt="" className="track-result-art" />
+                  ) : null}
+                  <span className="track-result-meta">
+                    <span className="track-result-title">{track.title}</span>
+                    <span className="track-result-artist">{track.artist}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         <div className="panel">

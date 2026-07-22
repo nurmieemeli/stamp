@@ -13,11 +13,11 @@ datasource db {
 }
 
 model User {
-  id                      String                    @id @default(cuid())
-  email                   String                    @unique
+  id                      String                   @id @default(cuid())
+  email                   String                   @unique
   passwordHash            String
-  username                String                    @unique
-  createdAt               DateTime                  @default(now())
+  username                String                   @unique
+  createdAt               DateTime                 @default(now())
   // No column-level default (SQLite disallows non-constant defaults on
   // ADD COLUMN) — the migration backfills existing rows to now() directly,
   // and every db.user.create() call explicitly sets this field.
@@ -25,7 +25,7 @@ model User {
   profile                 Profile?
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
-  invitesUsed             InviteCode[]              @relation("InviteCodeUser")
+  invitesUsed             InviteCode[]             @relation("InviteCodeUser")
 }
 
 model PasswordResetToken {
@@ -65,19 +65,23 @@ model InviteCode {
 }
 
 model Profile {
-  id           String         @id @default(cuid())
-  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String         @unique
-  displayName  String
-  eyebrow      String         @default("")
-  bio          String         @default("")
-  bioSecondary String         @default("")
-  trackTitle   String         @default("")
-  avatarUrl    String         @default("")
-  palette      String         @default("amber")
-  viewCount    Int            @default(0)
-  links        Link[]
-  badges       ProfileBadge[]
+  id              String         @id @default(cuid())
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String         @unique
+  displayName     String
+  eyebrow         String         @default("")
+  bio             String         @default("")
+  bioSecondary    String         @default("")
+  trackTitle      String         @default("")
+  trackArtist     String         @default("")
+  trackPreviewUrl String         @default("")
+  trackArtworkUrl String         @default("")
+  trackUrl        String         @default("")
+  avatarUrl       String         @default("")
+  palette         String         @default("amber")
+  viewCount       Int            @default(0)
+  links           Link[]
+  badges          ProfileBadge[]
 }
 
 model Link {

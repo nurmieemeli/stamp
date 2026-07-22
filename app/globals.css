@@ -502,6 +502,104 @@ select:focus-visible {
   min-width: 0;
 }
 
+.track-selected {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  margin-bottom: 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+
+.track-selected-art {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+.track-selected-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.track-selected-title {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-selected-artist {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-results {
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.track-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.track-result:last-child {
+  border-bottom: none;
+}
+
+.track-result:hover {
+  background: var(--surface-raised);
+}
+
+.track-result-art {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+.track-result-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.track-result-title {
+  font-size: 0.75rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-result-artist {
+  font-size: 0.6875rem;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .badge-picker {
   display: flex;
   flex-wrap: wrap;
@@ -655,6 +753,21 @@ select:focus-visible {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 24px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+}
+
+.pagination .is-disabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 .invite-row {
@@ -916,6 +1029,14 @@ select:focus-visible {
   border-left: 2px solid var(--accent);
 }
 
+.spinning-art {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
 .play-toggle {
   color: var(--accent);
   font-size: 0.8125rem;
@@ -924,15 +1045,35 @@ select:focus-visible {
   text-align: center;
 }
 
+.play-toggle:disabled {
+  color: var(--text-faint);
+  cursor: not-allowed;
+}
+
 .track-info {
   flex: 1;
   min-width: 0;
 }
 
 .track-title {
+  display: block;
   margin: 0;
   font-size: 0.8125rem;
   color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+a.track-title:hover {
+  color: var(--accent);
+}
+
+.track-artist {
+  margin: 2px 0 0;
+  font-size: 0.6875rem;
+  color: var(--text-faint);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
