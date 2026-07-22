@@ -38,10 +38,13 @@ export async function forgotPasswordAction(
       data: { userId: user.id, tokenHash, expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS) },
     });
     const resetUrl = `${await baseUrl()}/reset-password/${token}`;
-    // Swallowed on purpose — the response below stays identical whether or
-    // not the account exists, so this endpoint can't be used to enumerate
-    // registered emails.
-    await sendPasswordResetEmail(user.email, resetUrl).catch(() => {});
+    // Failures are logged but not surfaced to the caller — the response
+    // below stays identical whether or not the account exists, so this
+    // endpoint can't be used to enumerate registered emails. Check server
+    // logs (not the UI) if members report not receiving reset emails.
+    await sendPasswordResetEmail(user.email, resetUrl).catch((err) => {
+      console.error("forgot-password: failed to send reset email", err);
+    });
   }
 
   return { error: "", submitted: true };

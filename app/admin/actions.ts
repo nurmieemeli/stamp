@@ -150,7 +150,8 @@ export async function adminResetPasswordAction(username: string): Promise<AdminR
 
   try {
     await sendPasswordResetEmail(user.email, resetUrl);
-  } catch {
+  } catch (err) {
+    console.error("admin reset-password: failed to send email", err);
     return { error: "Couldn't send the email — check the email service configuration.", sentTo: null };
   }
 
