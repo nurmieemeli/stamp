@@ -1,3 +1,5 @@
+import { containsProfanity } from "./content-filter";
+
 const USERNAME_RE = /^[a-z0-9](?:[a-z0-9-]{1,18}[a-z0-9])?$/;
 
 const RESERVED = new Set([
@@ -28,6 +30,17 @@ export function validateUsername(rawUsername: string): string | null {
   }
   if (RESERVED.has(username)) {
     return "That handle is reserved.";
+  }
+  if (containsProfanity(username)) {
+    return "That handle isn't allowed.";
+  }
+  return null;
+}
+
+/** Screens free-text profile fields (display name, bio, etc.) for slurs and profanity. */
+export function validateCleanText(label: string, value: string): string | null {
+  if (containsProfanity(value)) {
+    return `${label} contains language that isn't allowed.`;
   }
   return null;
 }

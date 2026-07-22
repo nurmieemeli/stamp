@@ -3,7 +3,7 @@
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { signIn } from "@/lib/auth";
-import { normalizeUsername, validateUsername } from "@/lib/validation";
+import { normalizeUsername, validateUsername, validateCleanText } from "@/lib/validation";
 import { Prisma } from "@/app/generated/prisma/client";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
@@ -33,6 +33,11 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
   const usernameError = validateUsername(username);
   if (usernameError) {
     return { error: usernameError };
+  }
+
+  const displayNameError = validateCleanText("Display name", displayName);
+  if (displayNameError) {
+    return { error: displayNameError };
   }
 
   if (password.length < 8) {

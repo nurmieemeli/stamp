@@ -10,6 +10,7 @@ import { db } from "@/lib/db";
 import { isKnownPlatform } from "@/lib/platforms";
 import { isValidPalette, DEFAULT_PALETTE } from "@/lib/palettes";
 import { AVATAR_DIR, deleteAvatarFile } from "@/lib/avatar-storage";
+import { validateCleanText } from "@/lib/validation";
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 const AVATAR_DIMENSION = 800;
@@ -44,6 +45,19 @@ export async function saveProfileAction(payload: SaveProfilePayload): Promise<Sa
   const links = payload.links
     .filter((l) => isKnownPlatform(l.platform) && l.value.trim())
     .map((l) => ({ platform: l.platform, value: l.value.trim() }));
+
+  const textFields: [string, string][] = [
+    ["Display name", displayName],
+    ["Role / location", payload.eyebrow],
+    ["Bio", payload.bio],
+    ["Bio, line two", payload.bioSecondary],
+    ["Now spinning", payload.trackTitle],
+    ...links.map((l): [string, string] => ["A link", l.value]),
+  ];
+  for (const [label, value] of textFields) {
+    const error = validateCleanText(label, value);
+    if (error) return { error, savedAt: null };
+  }
 
   const palette = isValidPalette(payload.palette) ? payload.palette : DEFAULT_PALETTE;
 

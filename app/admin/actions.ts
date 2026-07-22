@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { isAdminEmail } from "@/lib/admin";
-import { normalizeUsername, validateUsername } from "@/lib/validation";
+import { normalizeUsername, validateUsername, validateCleanText } from "@/lib/validation";
 import { isValidPalette, DEFAULT_PALETTE } from "@/lib/palettes";
 import { generateResetToken, RESET_TOKEN_TTL_MS } from "@/lib/reset-token";
 import { sendPasswordResetEmail } from "@/lib/email";
@@ -85,6 +85,18 @@ export async function updateUserDetailsAction(payload: AdminUserUpdatePayload): 
   const displayName = payload.displayName.trim();
   if (!displayName) {
     return { error: "Display name can't be empty.", savedUsername: null };
+  }
+
+  const textFields: [string, string][] = [
+    ["Display name", displayName],
+    ["Role / location", payload.eyebrow],
+    ["Bio", payload.bio],
+    ["Bio, line two", payload.bioSecondary],
+    ["Now spinning", payload.trackTitle],
+  ];
+  for (const [label, value] of textFields) {
+    const textError = validateCleanText(label, value);
+    if (textError) return { error: textError, savedUsername: null };
   }
 
   const palette = isValidPalette(payload.palette) ? payload.palette : DEFAULT_PALETTE;
