@@ -14,13 +14,8 @@ export function ProfileView({ profile }: { profile: ProfileData }) {
   return (
     <div className="window" style={style}>
       <div className="titlebar">
-        <div className="dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
         <div className="path">
-          visiting <b>{profile.username}</b>
+          <b>{profile.username}</b>
         </div>
         <div className="live">
           <i></i>

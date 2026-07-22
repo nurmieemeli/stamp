@@ -1012,20 +1012,6 @@ select:focus-visible {
   background: var(--surface-raised);
 }
 
-.dots {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.dots span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--line);
-  border: 1px solid var(--text-faint);
-}
-
 .titlebar .path {
   font-size: 0.75rem;
   color: var(--text-muted);
