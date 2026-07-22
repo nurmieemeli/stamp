@@ -80,7 +80,12 @@ export default async function PublicProfilePage({ params }: { params: Promise<Pa
     avatarUrl: profile.avatarUrl,
     paletteKey: profile.palette,
     viewCount: alreadySeen ? profile.viewCount : profile.viewCount + 1,
-    badges: profile.badges.map((pb) => ({ key: pb.badge.key, label: pb.badge.label })),
+    badges: profile.badges.map((pb) => ({
+      key: pb.badge.key,
+      label: pb.badge.label,
+      color: pb.badge.color,
+      icon: pb.badge.icon,
+    })),
     links: profile.links.map((l) => {
       const url = resolveLinkUrl(l.platform, l.value);
       return { id: l.id, platform: l.platform, label: getPlatformLabel(l.platform), sub: displayUrl(url), url };

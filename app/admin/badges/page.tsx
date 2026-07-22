@@ -43,6 +43,8 @@ export default async function AdminBadgesPage() {
                 id={badge.id}
                 badgeKey={badge.key}
                 initialLabel={badge.label}
+                initialColor={badge.color}
+                initialIcon={badge.icon}
                 memberCount={badge._count.profiles}
               />
             ))

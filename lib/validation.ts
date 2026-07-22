@@ -56,6 +56,13 @@ export function validateCleanText(label: string, value: string): string | null {
   return null;
 }
 
+const HEX_COLOR_RE = /^#[0-9a-f]{6}$/i;
+
+/** True for a 6-digit hex color like "#6fcf7f" — the format an <input type="color"> submits. */
+export function isHexColor(value: string): boolean {
+  return HEX_COLOR_RE.test(value);
+}
+
 /**
  * True for an empty string (field is optional) or a well-formed https URL.
  * Used to sanity-check now-playing preview/artwork/track URLs before they're

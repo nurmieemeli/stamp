@@ -9,6 +9,8 @@ export type ProfileLink = {
 export type ProfileBadgeView = {
   key: string;
   label: string;
+  color: string;
+  icon: string;
 };
 
 export type ProfileData = {

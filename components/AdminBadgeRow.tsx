@@ -1,29 +1,38 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { updateBadgeLabelAction, deleteBadgeAction } from "@/app/admin/badges/actions";
+import { updateBadgeAction, deleteBadgeAction } from "@/app/admin/badges/actions";
 
 export function AdminBadgeRow({
   id,
   badgeKey,
   initialLabel,
+  initialColor,
+  initialIcon,
   memberCount,
 }: {
   id: string;
   badgeKey: string;
   initialLabel: string;
+  initialColor: string;
+  initialIcon: string;
   memberCount: number;
 }) {
   const [label, setLabel] = useState(initialLabel);
+  const [color, setColor] = useState(initialColor);
+  const [icon, setIcon] = useState(initialIcon);
   const [isSaving, startSave] = useTransition();
   const [isDeleting, startDelete] = useTransition();
   const [error, setError] = useState("");
   const [deleted, setDeleted] = useState(false);
 
+  const isDirty =
+    label.trim() !== initialLabel.trim() || color !== initialColor || icon.trim() !== initialIcon.trim();
+
   function handleSave() {
     setError("");
     startSave(async () => {
-      const result = await updateBadgeLabelAction(id, label);
+      const result = await updateBadgeAction(id, label, color, icon);
       if (result.error) setError(result.error);
     });
   }
@@ -54,6 +63,19 @@ export function AdminBadgeRow({
       <div className="invite-row">
         <span className="code">{badgeKey}</span>
         <input
+          type="color"
+          className="badge-row-color"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+          aria-label={`Color for ${badgeKey}`}
+        />
+        <input
+          className="badge-row-icon"
+          value={icon}
+          onChange={(e) => setIcon(e.target.value)}
+          aria-label={`Icon for ${badgeKey}`}
+        />
+        <input
           className="badge-row-label"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
@@ -66,7 +88,7 @@ export function AdminBadgeRow({
           type="button"
           className="button-ghost button-small"
           onClick={handleSave}
-          disabled={isSaving || label.trim() === initialLabel.trim() || !label.trim()}
+          disabled={isSaving || !isDirty || !label.trim()}
         >
           {isSaving ? "Saving…" : "Save"}
         </button>

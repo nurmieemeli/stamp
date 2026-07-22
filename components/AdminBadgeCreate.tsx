@@ -3,20 +3,27 @@
 import { useState, useTransition } from "react";
 import { createBadgeAction } from "@/app/admin/badges/actions";
 
+const DEFAULT_COLOR = "#6fcf7f";
+const DEFAULT_ICON = "✓";
+
 export function AdminBadgeCreate() {
   const [label, setLabel] = useState("");
+  const [color, setColor] = useState(DEFAULT_COLOR);
+  const [icon, setIcon] = useState(DEFAULT_ICON);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
 
   function handleCreate() {
     setError("");
     startTransition(async () => {
-      const result = await createBadgeAction(label);
+      const result = await createBadgeAction(label, color, icon);
       if (result.error) {
         setError(result.error);
         return;
       }
       setLabel("");
+      setColor(DEFAULT_COLOR);
+      setIcon(DEFAULT_ICON);
     });
   }
 
@@ -31,6 +38,26 @@ export function AdminBadgeCreate() {
           onChange={(e) => setLabel(e.target.value)}
           placeholder="Beta Tester"
         />
+      </div>
+      <div className="badge-create-row">
+        <div className="field field-tight">
+          <label htmlFor="new-badge-color">Color</label>
+          <input
+            id="new-badge-color"
+            type="color"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+          />
+        </div>
+        <div className="field field-tight">
+          <label htmlFor="new-badge-icon">Icon</label>
+          <input
+            id="new-badge-icon"
+            value={icon}
+            onChange={(e) => setIcon(e.target.value)}
+            placeholder="✓"
+          />
+        </div>
       </div>
       <button className="button" type="button" onClick={handleCreate} disabled={isPending || !label.trim()}>
         {isPending ? "Creating…" : "Create badge"}

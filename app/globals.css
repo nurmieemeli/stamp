@@ -940,6 +940,54 @@ select:focus-visible {
   white-space: nowrap;
 }
 
+.badge-row-color {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.badge-row-icon {
+  flex-shrink: 0;
+  width: 52px;
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  text-align: center;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: 8px 6px;
+  border-radius: 0;
+  transition: border-color 0.15s ease;
+}
+
+.badge-row-icon:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.badge-create-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.badge-create-row .field-tight input[type="color"] {
+  width: 44px;
+  height: 38px;
+  padding: 2px;
+  cursor: pointer;
+}
+
+.badge-create-row .field-tight input:not([type="color"]) {
+  width: 64px;
+  text-align: center;
+}
+
 /* ---- profile window (public page + dashboard live preview) ---- */
 /* Palette tokens (--bg, --surface, --accent, etc.) are overridden inline on
    .window per profile — see lib/palettes.ts + components/ProfileView.tsx. */
@@ -1084,11 +1132,11 @@ select:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  border: 1px solid color-mix(in srgb, var(--ok) 35%, var(--line));
+  border: 1px solid color-mix(in srgb, var(--stamp-color) 35%, var(--line));
   padding: 4px 10px;
   font-size: 0.6875rem;
   letter-spacing: 0.03em;
-  color: var(--ok);
+  color: var(--stamp-color);
   background: var(--bg);
   transition: transform 0.15s ease;
 }
@@ -1097,8 +1145,8 @@ select:focus-visible {
   transform: translateY(-1px);
 }
 
-.stamp::before {
-  content: "✓";
+.stamp-icon {
+  line-height: 1;
 }
 
 .bio {

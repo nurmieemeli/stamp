@@ -38,7 +38,7 @@ export function ProfileView({ profile }: { profile: ProfileData }) {
         {profile.badges.length > 0 ? (
           <div className="stamps">
             {profile.badges.map((badge) => (
-              <StampBadge key={badge.key} label={badge.label} />
+              <StampBadge key={badge.key} label={badge.label} color={badge.color} icon={badge.icon} />
             ))}
           </div>
         ) : null}

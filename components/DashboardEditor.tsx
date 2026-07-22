@@ -34,7 +34,7 @@ type InitialProfile = {
   palette: string;
   viewCount: number;
   links: EditableLink[];
-  badges: { key: string; label: string }[];
+  badges: { key: string; label: string; color: string; icon: string }[];
 };
 
 let linkIdCounter = 0;

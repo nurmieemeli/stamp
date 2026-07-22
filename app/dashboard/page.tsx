@@ -62,7 +62,12 @@ export default async function DashboardPage() {
               platform: l.platform,
               value: l.value,
             })),
-            badges: profile.badges.map((b) => ({ key: b.badge.key, label: b.badge.label })),
+            badges: profile.badges.map((b) => ({
+              key: b.badge.key,
+              label: b.badge.label,
+              color: b.badge.color,
+              icon: b.badge.icon,
+            })),
           }}
         />
       </main>
