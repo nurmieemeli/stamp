@@ -82,7 +82,7 @@ export function ProfileView({ profile }: { profile: ProfileData }) {
       </div>
 
       <footer className="statusbar">
-        <span>stamp://{profile.username}</span>
+        <span className="statusbar-path">stamp://{profile.username}</span>
         <a href="mailto:report@stamp.rip?subject=Report%20profile">report</a>
         <Link href="/signup">claim your handle</Link>
         <span className="cursor" aria-hidden="true"></span>
