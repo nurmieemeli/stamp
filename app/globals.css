@@ -993,6 +993,13 @@ select:focus-visible {
   border: 1px solid var(--line);
   box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.6);
   animation: fade-in-up 0.45s ease-out both;
+  /* .window can be stretched taller than its content by the flex centering
+     in .profile-page (or the dashboard preview's layout) — a column flex
+     here with .window-body absorbing the extra space is what keeps
+     .statusbar pinned to the actual bottom edge instead of leaving a dead
+     gap between the content and the footer. */
+  display: flex;
+  flex-direction: column;
 }
 
 .titlebar {
@@ -1000,6 +1007,7 @@ select:focus-visible {
   align-items: center;
   gap: 14px;
   padding: 11px 16px;
+  flex-shrink: 0;
   border-bottom: 1px solid var(--line);
   background: var(--surface-raised);
 }
@@ -1058,6 +1066,7 @@ select:focus-visible {
 
 .window-body {
   padding: clamp(20px, 4vw, 34px);
+  flex: 1;
 }
 
 .identity {
@@ -1386,6 +1395,7 @@ a.track-title:hover {
   gap: 16px;
   margin-top: 22px;
   padding: 9px 16px;
+  flex-shrink: 0;
   background: var(--surface-raised);
   border-top: 1px solid var(--line);
   color: var(--text-faint);
