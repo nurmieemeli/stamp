@@ -830,7 +830,7 @@ select:focus-visible {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 0 0 18px;
+  margin: 26px 0 4px;
 }
 
 .stamp {
