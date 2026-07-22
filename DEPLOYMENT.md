@@ -17,12 +17,12 @@ sudo apt install -y git build-essential python3 curl ufw
 
 ## 2. Install Node.js
 
-Next.js here requires **Node ≥ 20.9**. Install Node 20 LTS via NodeSource:
+Next.js itself only requires Node ≥ 20.9, but one of Prisma's sub-packages (`@prisma/streams-local`) wants ≥ 22 — installing 20.x works but prints an `EBADENGINE` warning on every `npm ci`. Install Node 22 LTS via NodeSource to avoid that:
 
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt install -y nodejs
-node -v   # confirm v20.x or newer
+node -v   # confirm v22.x or newer
 ```
 
 ## 3. Create a dedicated user to run the app (recommended)
