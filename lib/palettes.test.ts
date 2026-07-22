@@ -1,11 +1,31 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PALETTE, getPalette, isValidPalette, PALETTES, paletteCssVars } from "./palettes";
+import { DEFAULT_PALETTE, getPalette, isProPalette, isValidPalette, PALETTES, paletteCssVars } from "./palettes";
 
 describe("palette catalog", () => {
-  it("has five distinct palettes", () => {
+  it("has eight distinct palettes", () => {
     const keys = PALETTES.map((p) => p.key);
-    expect(keys.length).toBe(5);
-    expect(new Set(keys).size).toBe(5);
+    expect(keys.length).toBe(8);
+    expect(new Set(keys).size).toBe(8);
+  });
+
+  it("has exactly three Pro palettes", () => {
+    expect(PALETTES.filter((p) => p.pro).length).toBe(3);
+  });
+
+  it("treats the five original palettes as free, not Pro", () => {
+    for (const key of ["amber", "nord", "dracula", "forest", "paper"]) {
+      expect(isProPalette(key)).toBe(false);
+    }
+  });
+
+  it("treats the new palettes as Pro-only", () => {
+    for (const key of ["midnight", "rosewood", "mono"]) {
+      expect(isProPalette(key)).toBe(true);
+    }
+  });
+
+  it("still recognizes Pro palette keys as valid (gating is separate from validity)", () => {
+    expect(isValidPalette("mono")).toBe(true);
   });
 
   it("includes the default palette", () => {

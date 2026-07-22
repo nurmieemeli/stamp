@@ -1,18 +1,23 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import { ProfileView } from "@/components/ProfileView";
 import {
   saveProfileAction,
   uploadAvatarAction,
   removeAvatarAction,
   searchTracksAction,
+  createProCheckoutAction,
   type SaveProfilePayload,
   type SaveState,
   type AvatarState,
+  type CheckoutState,
 } from "@/app/dashboard/actions";
 import { PLATFORMS, getPlatform, getPlatformLabel, resolveLinkUrl, displayUrl } from "@/lib/platforms";
 import { PALETTES, DEFAULT_PALETTE } from "@/lib/palettes";
+import { FREE_LINK_LIMIT, PRO_LINK_LIMIT } from "@/lib/limits";
+import { PRO_PRICE_LABEL } from "@/lib/pro-price";
 import type { TrackResult } from "@/lib/music-search";
 import type { ProfileData } from "@/lib/types";
 
@@ -32,6 +37,9 @@ type InitialProfile = {
   trackUrl: string;
   avatarUrl: string;
   palette: string;
+  customAccent: string;
+  isPro: boolean;
+  isStripeConfigured: boolean;
   viewCount: number;
   links: EditableLink[];
   badges: { key: string; label: string; color: string; icon: string }[];
@@ -50,6 +58,9 @@ export function DashboardEditor({
   username: string;
   initialProfile: InitialProfile;
 }) {
+  const searchParams = useSearchParams();
+  const justUpgraded = searchParams.get("upgraded") === "1";
+
   const [displayName, setDisplayName] = useState(initialProfile.displayName);
   const [bio, setBio] = useState(initialProfile.bio);
   const [selectedTrack, setSelectedTrack] = useState<TrackResult | null>(
@@ -71,12 +82,31 @@ export function DashboardEditor({
   const [avatarUrl, setAvatarUrl] = useState(initialProfile.avatarUrl);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [paletteKey, setPaletteKey] = useState(initialProfile.palette || DEFAULT_PALETTE);
+  const [customAccent, setCustomAccent] = useState(initialProfile.customAccent);
   const [avatarStatus, setAvatarStatus] = useState<AvatarState>({ error: "", avatarUrl: null });
   const [isAvatarPending, startAvatarTransition] = useTransition();
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [isPending, startTransition] = useTransition();
   const [status, setStatus] = useState<SaveState>({ error: "", savedAt: null });
+
+  const isPro = initialProfile.isPro;
+  const [checkoutStatus, setCheckoutStatus] = useState<CheckoutState>({ error: "", url: null });
+  const [isCheckoutPending, startCheckoutTransition] = useTransition();
+
+  function handleUpgrade() {
+    setCheckoutStatus({ error: "", url: null });
+    startCheckoutTransition(async () => {
+      const result = await createProCheckoutAction();
+      if (result.error) {
+        setCheckoutStatus(result);
+        return;
+      }
+      if (result.url) {
+        window.location.assign(result.url);
+      }
+    });
+  }
 
   useEffect(() => {
     const query = trackQuery.trim();
@@ -111,6 +141,8 @@ export function DashboardEditor({
       trackUrl: selectedTrack?.trackUrl ?? "",
       avatarUrl: avatarPreview ?? avatarUrl,
       paletteKey,
+      customAccent: isPro ? customAccent : "",
+      isPro,
       viewCount: initialProfile.viewCount,
       badges: initialProfile.badges,
       links: links
@@ -128,6 +160,8 @@ export function DashboardEditor({
       avatarPreview,
       avatarUrl,
       paletteKey,
+      customAccent,
+      isPro,
       links,
       initialProfile.viewCount,
       initialProfile.badges,
@@ -199,6 +233,7 @@ export function DashboardEditor({
       trackArtworkUrl: selectedTrack?.artworkUrl ?? "",
       trackUrl: selectedTrack?.trackUrl ?? "",
       palette: paletteKey,
+      customAccent: isPro ? customAccent : "",
       links: links.map((l) => ({ platform: l.platform, value: l.value })),
     };
     startTransition(async () => {
@@ -208,10 +243,19 @@ export function DashboardEditor({
   }
 
   const currentAvatarSrc = avatarPreview ?? (avatarUrl || null);
+  const linkCap = isPro ? PRO_LINK_LIMIT : FREE_LINK_LIMIT;
 
   return (
     <div className="dashboard-shell">
       <div>
+        {justUpgraded ? (
+          <p className="hint" style={{ marginBottom: 18 }}>
+            {isPro
+              ? "Payment received — you're all set, Pro perks are active."
+              : "Payment received — your Pro perks will appear within a few seconds. Refresh if you don't see them yet."}
+          </p>
+        ) : null}
+
         <div className="panel">
           <p className="panel-title">Photo</p>
           <div className="avatar-row">
@@ -261,21 +305,70 @@ export function DashboardEditor({
           <p className="panel-title">Palette</p>
           <div className="palette-picker">
             <div className="palette-swatches">
-              {PALETTES.map((p) => (
-                <button
-                  key={p.key}
-                  type="button"
-                  className="palette-swatch"
-                  aria-label={p.label}
-                  aria-pressed={p.key === paletteKey}
-                  onClick={() => setPaletteKey(p.key)}
-                >
-                  <span className="fill" style={{ background: p.tokens.accent }} />
-                </button>
-              ))}
+              {PALETTES.map((p) => {
+                const locked = p.pro && !isPro;
+                return (
+                  <button
+                    key={p.key}
+                    type="button"
+                    className={`palette-swatch${locked ? " palette-swatch-locked" : ""}`}
+                    aria-label={locked ? `${p.label} (Pro)` : p.label}
+                    aria-pressed={p.key === paletteKey}
+                    disabled={locked}
+                    onClick={() => setPaletteKey(p.key)}
+                  >
+                    <span className="fill" style={{ background: p.tokens.accent }} />
+                    {locked ? <span className="palette-swatch-lock">Pro</span> : null}
+                  </button>
+                );
+              })}
             </div>
             <span className="palette-label">{PALETTES.find((p) => p.key === paletteKey)?.label}</span>
           </div>
+
+          <div className="field" style={{ marginTop: 18 }}>
+            <label htmlFor="customAccent">Custom accent color{isPro ? "" : " (Pro)"}</label>
+            <div className="custom-accent-row">
+              <input
+                id="customAccent"
+                type="color"
+                value={customAccent || "#6fcf7f"}
+                onChange={(e) => setCustomAccent(e.target.value)}
+                disabled={!isPro}
+              />
+              {isPro && customAccent ? (
+                <button type="button" className="button-ghost button-small" onClick={() => setCustomAccent("")}>
+                  Reset to palette accent
+                </button>
+              ) : null}
+            </div>
+            {!isPro ? <span className="hint">Upgrade to Pro to override the accent color on any palette.</span> : null}
+          </div>
+        </div>
+
+        <div className="panel">
+          <p className="panel-title">Pro</p>
+          {isPro ? (
+            <p className="hint">You&rsquo;re a Pro member — thanks for the support.</p>
+          ) : initialProfile.isStripeConfigured ? (
+            <>
+              <p className="hint">
+                Unlock extra palettes, a custom accent color, more links, and remove the footer branding.
+              </p>
+              <button
+                className="button"
+                type="button"
+                onClick={handleUpgrade}
+                disabled={isCheckoutPending}
+                style={{ marginTop: 12 }}
+              >
+                {isCheckoutPending ? "Redirecting…" : `Upgrade to Pro — ${PRO_PRICE_LABEL}`}
+              </button>
+              {checkoutStatus.error ? <p className="field-error">{checkoutStatus.error}</p> : null}
+            </>
+          ) : (
+            <p className="hint">Payments aren&rsquo;t set up yet — check back soon.</p>
+          )}
         </div>
 
         <div className="panel">
@@ -396,9 +489,19 @@ export function DashboardEditor({
               </div>
             );
           })}
-          <button type="button" className="button-ghost button-small" style={{ marginTop: 16 }} onClick={addLink}>
+          <button
+            type="button"
+            className="button-ghost button-small"
+            style={{ marginTop: 16 }}
+            onClick={addLink}
+            disabled={links.length >= linkCap}
+          >
             + Add link
           </button>
+          <p className="hint" style={{ marginTop: 8 }}>
+            {links.length}/{linkCap} links on your {isPro ? "Pro" : "free"} plan
+            {isPro ? "" : " — upgrade for more"}.
+          </p>
         </div>
 
         <div className="panel">

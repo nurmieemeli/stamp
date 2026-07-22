@@ -22,10 +22,17 @@ model User {
   // ADD COLUMN) — the migration backfills existing rows to now() directly,
   // and every db.user.create() call explicitly sets this field.
   emailVerifiedAt         DateTime?
+  isPro                   Boolean                  @default(false)
+  // Nullable rather than a "" default so it's safe to add @unique later
+  // without an empty-string collision (SQLite unique indexes treat every ""
+  // as equal, but allow multiple NULLs).
+  stripeCustomerId        String?
+  proPurchasedAt          DateTime?
   profile                 Profile?
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
   invitesUsed             InviteCode[]             @relation("InviteCodeUser")
+  purchases               Purchase[]
 }
 
 model PasswordResetToken {
@@ -77,6 +84,9 @@ model Profile {
   trackUrl        String         @default("")
   avatarUrl       String         @default("")
   palette         String         @default("amber")
+  // Hex accent override, Pro-only — "" means unset, fall back to the
+  // selected palette's own accent.
+  customAccent    String         @default("")
   viewCount       Int            @default(0)
   links           Link[]
   badges          ProfileBadge[]
@@ -111,4 +121,24 @@ model ProfileBadge {
 
   @@id([profileId, badgeId])
   @@index([badgeId])
+}
+
+model Purchase {
+  id     String @id @default(cuid())
+  // onDelete: Cascade matches every other audit/join table in this schema —
+  // note that means deleting a User destroys their payment history too.
+  // There's no account-deletion flow today, so this is moot for now, but
+  // flag it before one gets built.
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  stripeCheckoutSessionId String   @unique
+  // Kept even though nothing reads it yet — the natural handle for a future
+  // refund/chargeback webhook without a second migration.
+  stripePaymentIntentId   String   @default("")
+  amountTotal             Int
+  currency                String
+  createdAt               DateTime @default(now())
+
+  @@index([userId])
 }

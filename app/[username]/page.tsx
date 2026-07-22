@@ -79,6 +79,8 @@ export default async function PublicProfilePage({ params }: { params: Promise<Pa
     trackUrl: profile.trackUrl,
     avatarUrl: profile.avatarUrl,
     paletteKey: profile.palette,
+    customAccent: profile.customAccent,
+    isPro: user.isPro,
     viewCount: alreadySeen ? profile.viewCount : profile.viewCount + 1,
     badges: profile.badges.map((pb) => ({
       key: pb.badge.key,

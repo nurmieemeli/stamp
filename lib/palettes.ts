@@ -17,6 +17,8 @@ export type Palette = {
   label: string;
   pageBg: string;
   tokens: PaletteTokens;
+  /** Pro-only palette — gated in saveProfileAction and the dashboard picker. */
+  pro?: boolean;
 };
 
 export const PALETTES: Palette[] = [
@@ -110,6 +112,63 @@ export const PALETTES: Palette[] = [
       ok: "#3F7D4F",
     },
   },
+  {
+    key: "midnight",
+    label: "Midnight",
+    pageBg: "#060A10",
+    pro: true,
+    tokens: {
+      bg: "#0A0F16",
+      surface: "#10161F",
+      surfaceRaised: "#161D28",
+      line: "#232C38",
+      lineSoft: "#1B222C",
+      text: "#DCE6F0",
+      textMuted: "#7C8FA6",
+      textFaint: "#46586C",
+      accent: "#4FD1E8",
+      accentInk: "#001318",
+      ok: "#6FCF7F",
+    },
+  },
+  {
+    key: "rosewood",
+    label: "Rosewood",
+    pageBg: "#100609",
+    pro: true,
+    tokens: {
+      bg: "#160A0F",
+      surface: "#1F1116",
+      surfaceRaised: "#28161C",
+      line: "#3C232B",
+      lineSoft: "#2C1B20",
+      text: "#EEDFE2",
+      textMuted: "#9A7F86",
+      textFaint: "#664A52",
+      accent: "#E0708F",
+      accentInk: "#1F0510",
+      ok: "#7FD9A0",
+    },
+  },
+  {
+    key: "mono",
+    label: "Mono",
+    pageBg: "#050505",
+    pro: true,
+    tokens: {
+      bg: "#0A0A0A",
+      surface: "#121212",
+      surfaceRaised: "#1A1A1A",
+      line: "#2C2C2C",
+      lineSoft: "#212121",
+      text: "#EDEDED",
+      textMuted: "#8A8A8A",
+      textFaint: "#525252",
+      accent: "#FFFFFF",
+      accentInk: "#0A0A0A",
+      ok: "#6FCF7F",
+    },
+  },
 ];
 
 const PALETTE_BY_KEY = new Map(PALETTES.map((p) => [p.key, p]));
@@ -121,6 +180,10 @@ export function getPalette(key: string): Palette {
 
 export function isValidPalette(key: string): boolean {
   return PALETTE_BY_KEY.has(key);
+}
+
+export function isProPalette(key: string): boolean {
+  return PALETTE_BY_KEY.get(key)?.pro === true;
 }
 
 export function paletteCssVars(tokens: PaletteTokens): Record<string, string> {

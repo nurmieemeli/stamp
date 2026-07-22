@@ -5,11 +5,21 @@ import { StampBadge } from "@/components/StampBadge";
 import { IndexLink } from "@/components/IndexLink";
 import { NowSpinning } from "@/components/NowSpinning";
 import { getPalette, paletteCssVars } from "@/lib/palettes";
+import { contrastInk } from "@/lib/color";
+import { isHexColor } from "@/lib/validation";
 import type { ProfileData } from "@/lib/types";
 
 export function ProfileView({ profile }: { profile: ProfileData }) {
   const palette = getPalette(profile.paletteKey);
-  const style = paletteCssVars(palette.tokens) as CSSProperties;
+  const vars = paletteCssVars(palette.tokens);
+
+  // Pro-only accent override — replaces just --accent/--accent-ink on top of
+  // whichever base palette is selected, everything else stays untouched.
+  if (profile.isPro && isHexColor(profile.customAccent)) {
+    vars["--accent"] = profile.customAccent;
+    vars["--accent-ink"] = contrastInk(profile.customAccent);
+  }
+  const style = vars as CSSProperties;
 
   return (
     <div className="window" style={style}>
@@ -77,7 +87,7 @@ export function ProfileView({ profile }: { profile: ProfileData }) {
           <b>{profile.username}</b>
         </span>
         <a href="mailto:report@stamp.rip?subject=Report%20profile">report</a>
-        <Link href="/signup">claim your handle</Link>
+        {!profile.isPro ? <Link href="/signup">claim your handle</Link> : null}
       </footer>
     </div>
   );

@@ -8,11 +8,15 @@ import { revalidatePath } from "next/cache";
 import { auth, signOut } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { isKnownPlatform } from "@/lib/platforms";
-import { isValidPalette, DEFAULT_PALETTE } from "@/lib/palettes";
+import { isValidPalette, isProPalette, DEFAULT_PALETTE } from "@/lib/palettes";
 import { AVATAR_DIR, deleteAvatarFile } from "@/lib/avatar-storage";
-import { validateCleanText, isHttpsUrl } from "@/lib/validation";
+import { validateCleanText, isHttpsUrl, isHexColor } from "@/lib/validation";
 import { searchTracks, type TrackResult } from "@/lib/music-search";
 import { rateLimit } from "@/lib/rate-limit";
+import { exceedsLinkCap, FREE_LINK_LIMIT, PRO_LINK_LIMIT } from "@/lib/limits";
+import { stripe } from "@/lib/stripe";
+import { PRO_PRICE_CENTS, PRO_PRICE_CURRENCY } from "@/lib/pro-price";
+import { baseUrl } from "@/lib/url";
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 const AVATAR_DIMENSION = 800;
@@ -30,6 +34,7 @@ export type SaveProfilePayload = {
   trackArtworkUrl: string;
   trackUrl: string;
   palette: string;
+  customAccent: string;
   links: { platform: string; value: string }[];
 };
 
@@ -40,6 +45,18 @@ export async function saveProfileAction(payload: SaveProfilePayload): Promise<Sa
   if (!session?.user) {
     return { error: "Your session expired. Please log in again.", savedAt: null };
   }
+
+  const userId = session.user.id;
+
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { isPro: true, profile: { select: { id: true } } },
+  });
+  if (!user || !user.profile) {
+    return { error: "Profile not found.", savedAt: null };
+  }
+  const isPro = user.isPro;
+  const profileId = user.profile.id;
 
   const displayName = payload.displayName.trim();
   if (!displayName) {
@@ -69,9 +86,27 @@ export async function saveProfileAction(payload: SaveProfilePayload): Promise<Sa
     return { error: "Now playing data looks invalid — try searching again.", savedAt: null };
   }
 
+  if (isProPalette(payload.palette) && !isPro) {
+    return { error: "That palette is a Pro perk — upgrade to use it.", savedAt: null };
+  }
   const palette = isValidPalette(payload.palette) ? payload.palette : DEFAULT_PALETTE;
 
-  const userId = session.user.id;
+  const customAccent = payload.customAccent.trim();
+  if (customAccent) {
+    if (!isPro) {
+      return { error: "Custom accent colors are a Pro perk — upgrade to use one.", savedAt: null };
+    }
+    if (!isHexColor(customAccent)) {
+      return { error: "Custom accent must be a hex color, like #6fcf7f.", savedAt: null };
+    }
+  }
+
+  const currentLinkCount = await db.link.count({ where: { profileId } });
+  if (exceedsLinkCap(isPro, links.length, currentLinkCount)) {
+    const cap = isPro ? PRO_LINK_LIMIT : FREE_LINK_LIMIT;
+    const upsell = isPro ? "" : " Upgrade to Pro for more.";
+    return { error: `You're limited to ${cap} links on your current plan.${upsell}`, savedAt: null };
+  }
 
   await db.$transaction(async (tx) => {
     const profile = await tx.profile.update({
@@ -85,6 +120,7 @@ export async function saveProfileAction(payload: SaveProfilePayload): Promise<Sa
         trackArtworkUrl: payload.trackArtworkUrl.trim(),
         trackUrl: payload.trackUrl.trim(),
         palette,
+        customAccent,
       },
     });
 
@@ -99,6 +135,60 @@ export async function saveProfileAction(payload: SaveProfilePayload): Promise<Sa
   revalidatePath(`/${session.user.username}`);
 
   return { error: "", savedAt: Date.now() };
+}
+
+export type CheckoutState = { error: string; url: string | null };
+
+export async function createProCheckoutAction(): Promise<CheckoutState> {
+  const session = await auth();
+  if (!session?.user) {
+    return { error: "Your session expired. Please log in again.", url: null };
+  }
+
+  if (!stripe) {
+    return { error: "Payments aren't configured yet.", url: null };
+  }
+
+  const user = await db.user.findUnique({ where: { id: session.user.id } });
+  if (!user) {
+    return { error: "Account not found.", url: null };
+  }
+  if (user.isPro) {
+    return { error: "You're already Pro.", url: null };
+  }
+
+  let customerId = user.stripeCustomerId;
+  if (!customerId) {
+    const customer = await stripe.customers.create({ email: user.email });
+    customerId = customer.id;
+    await db.user.update({ where: { id: user.id }, data: { stripeCustomerId: customerId } });
+  }
+
+  const origin = await baseUrl();
+
+  const checkoutSession = await stripe.checkout.sessions.create({
+    mode: "payment",
+    customer: customerId,
+    line_items: [
+      {
+        price_data: {
+          currency: PRO_PRICE_CURRENCY,
+          unit_amount: PRO_PRICE_CENTS,
+          product_data: { name: "Stamp Pro — lifetime upgrade" },
+        },
+        quantity: 1,
+      },
+    ],
+    metadata: { userId: user.id },
+    success_url: `${origin}/dashboard?upgraded=1`,
+    cancel_url: `${origin}/dashboard?upgrade_cancelled=1`,
+  });
+
+  if (!checkoutSession.url) {
+    return { error: "Couldn't start checkout. Try again.", url: null };
+  }
+
+  return { error: "", url: checkoutSession.url };
 }
 
 export type AvatarState = { error: string; avatarUrl: string | null };

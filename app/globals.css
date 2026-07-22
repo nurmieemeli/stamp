@@ -787,6 +787,48 @@ select:focus-visible {
   text-shadow: 0 0 3px rgba(255, 255, 255, 0.6);
 }
 
+.palette-swatch-locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.palette-swatch-locked:hover {
+  transform: none;
+}
+
+.palette-swatch-lock {
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.5625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.custom-accent-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-accent-row input[type="color"] {
+  width: 44px;
+  height: 38px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.custom-accent-row input[type="color"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .preview-frame {
   position: sticky;
   top: 24px;

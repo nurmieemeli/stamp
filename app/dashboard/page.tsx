@@ -6,6 +6,8 @@ import { isAdminEmail } from "@/lib/admin";
 import { DashboardEditor } from "@/components/DashboardEditor";
 import { signOutAction } from "./actions";
 
+const isStripeConfigured = !!process.env.STRIPE_SECRET_KEY;
+
 export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
@@ -56,6 +58,9 @@ export default async function DashboardPage() {
             trackUrl: profile.trackUrl,
             avatarUrl: profile.avatarUrl,
             palette: profile.palette,
+            customAccent: profile.customAccent,
+            isPro: user.isPro,
+            isStripeConfigured,
             viewCount: profile.viewCount,
             links: profile.links.map((l) => ({
               id: l.id,

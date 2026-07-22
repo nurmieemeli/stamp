@@ -24,6 +24,8 @@ export type ProfileData = {
   trackUrl: string;
   avatarUrl: string;
   paletteKey: string;
+  customAccent: string;
+  isPro: boolean;
   viewCount: number;
   badges: ProfileBadgeView[];
   links: ProfileLink[];
