@@ -5,10 +5,10 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { isAdminEmail } from "@/lib/admin";
 import { validateCleanText, slugify, isHexColor } from "@/lib/validation";
+import { isBadgeIconKey } from "@/lib/badge-icons";
 import { Prisma } from "@/app/generated/prisma/client";
 
 const MAX_KEY_ATTEMPTS = 20;
-const MAX_ICON_LENGTH = 8; // generous — covers multi-codepoint emoji (ZWJ sequences, skin-tone modifiers)
 
 export type BadgeActionState = { error: string };
 
@@ -17,8 +17,7 @@ function validateBadgeFields(label: string, color: string, icon: string): string
   const textError = validateCleanText("Badge label", label);
   if (textError) return textError;
   if (!isHexColor(color)) return "Badge color must be a hex color, like #6fcf7f.";
-  if (!icon) return "Badge icon can't be empty.";
-  if ([...icon].length > MAX_ICON_LENGTH) return "Badge icon is too long — use a single emoji or symbol.";
+  if (!isBadgeIconKey(icon)) return "Pick a valid badge icon.";
   return null;
 }
 

@@ -1,7 +1,10 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useState, useTransition } from "react";
 import { updateBadgeAction, deleteBadgeAction } from "@/app/admin/badges/actions";
+import { BADGE_ICONS } from "@/lib/badge-icons";
+import { BadgeIcon } from "@/components/BadgeIcon";
 
 export function AdminBadgeRow({
   id,
@@ -26,8 +29,7 @@ export function AdminBadgeRow({
   const [error, setError] = useState("");
   const [deleted, setDeleted] = useState(false);
 
-  const isDirty =
-    label.trim() !== initialLabel.trim() || color !== initialColor || icon.trim() !== initialIcon.trim();
+  const isDirty = label.trim() !== initialLabel.trim() || color !== initialColor || icon !== initialIcon;
 
   function handleSave() {
     setError("");
@@ -69,12 +71,21 @@ export function AdminBadgeRow({
           onChange={(e) => setColor(e.target.value)}
           aria-label={`Color for ${badgeKey}`}
         />
-        <input
+        <select
           className="badge-row-icon"
           value={icon}
           onChange={(e) => setIcon(e.target.value)}
           aria-label={`Icon for ${badgeKey}`}
-        />
+        >
+          {BADGE_ICONS.map((i) => (
+            <option key={i.key} value={i.key}>
+              {i.label}
+            </option>
+          ))}
+        </select>
+        <div className="badge-icon-preview" style={{ "--stamp-color": color } as CSSProperties}>
+          <BadgeIcon icon={icon} />
+        </div>
         <input
           className="badge-row-label"
           value={label}

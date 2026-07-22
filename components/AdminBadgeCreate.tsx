@@ -1,15 +1,17 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useState, useTransition } from "react";
 import { createBadgeAction } from "@/app/admin/badges/actions";
+import { BADGE_ICONS, DEFAULT_BADGE_ICON } from "@/lib/badge-icons";
+import { BadgeIcon } from "@/components/BadgeIcon";
 
 const DEFAULT_COLOR = "#6fcf7f";
-const DEFAULT_ICON = "✓";
 
 export function AdminBadgeCreate() {
   const [label, setLabel] = useState("");
   const [color, setColor] = useState(DEFAULT_COLOR);
-  const [icon, setIcon] = useState(DEFAULT_ICON);
+  const [icon, setIcon] = useState<string>(DEFAULT_BADGE_ICON);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState("");
 
@@ -23,7 +25,7 @@ export function AdminBadgeCreate() {
       }
       setLabel("");
       setColor(DEFAULT_COLOR);
-      setIcon(DEFAULT_ICON);
+      setIcon(DEFAULT_BADGE_ICON);
     });
   }
 
@@ -51,12 +53,16 @@ export function AdminBadgeCreate() {
         </div>
         <div className="field field-tight">
           <label htmlFor="new-badge-icon">Icon</label>
-          <input
-            id="new-badge-icon"
-            value={icon}
-            onChange={(e) => setIcon(e.target.value)}
-            placeholder="✓"
-          />
+          <select id="new-badge-icon" value={icon} onChange={(e) => setIcon(e.target.value)}>
+            {BADGE_ICONS.map((i) => (
+              <option key={i.key} value={i.key}>
+                {i.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="badge-icon-preview" style={{ "--stamp-color": color } as CSSProperties}>
+          <BadgeIcon icon={icon} />
         </div>
       </div>
       <button className="button" type="button" onClick={handleCreate} disabled={isPending || !label.trim()}>

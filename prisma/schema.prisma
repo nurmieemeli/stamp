@@ -98,7 +98,7 @@ model Badge {
   key      String         @unique
   label    String
   color    String         @default("#6FCF7F")
-  icon     String         @default("✓")
+  icon     String         @default("check")
   profiles ProfileBadge[]
 }
 

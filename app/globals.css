@@ -953,16 +953,22 @@ select:focus-visible {
 
 .badge-row-icon {
   flex-shrink: 0;
-  width: 52px;
+  width: 110px;
   font-family: var(--font-mono);
-  font-size: 0.9375rem;
-  text-align: center;
+  font-size: 0.75rem;
   color: var(--text);
   background: var(--bg);
   border: 1px solid var(--line);
-  padding: 8px 6px;
+  padding: 8px 10px;
   border-radius: 0;
+  cursor: pointer;
   transition: border-color 0.15s ease;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-faint) 50%),
+    linear-gradient(135deg, var(--text-faint) 50%, transparent 50%);
+  background-position: right 10px top 55%, right 4px top 55%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
 }
 
 .badge-row-icon:focus {
@@ -970,8 +976,26 @@ select:focus-visible {
   outline: none;
 }
 
+.badge-icon-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--stamp-color);
+}
+
+.badge-icon-preview .badge-icon {
+  width: 15px;
+  height: 15px;
+}
+
 .badge-create-row {
   display: flex;
+  align-items: flex-end;
   gap: 16px;
   margin-bottom: 18px;
 }
@@ -983,9 +1007,8 @@ select:focus-visible {
   cursor: pointer;
 }
 
-.badge-create-row .field-tight input:not([type="color"]) {
-  width: 64px;
-  text-align: center;
+.badge-create-row .field-tight select {
+  width: 140px;
 }
 
 /* ---- profile window (public page + dashboard live preview) ---- */
@@ -1145,8 +1168,10 @@ select:focus-visible {
   transform: translateY(-1px);
 }
 
-.stamp-icon {
-  line-height: 1;
+.badge-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 
 .bio {
