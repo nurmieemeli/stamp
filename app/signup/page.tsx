@@ -3,6 +3,7 @@
 import { Suspense, useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Turnstile } from "@/components/Turnstile";
 import { signupAction, type SignupState } from "./actions";
 
 const initialState: SignupState = { error: "" };
@@ -48,6 +49,7 @@ function SignupForm() {
         />
         <span className="hint">At least 8 characters.</span>
       </div>
+      <Turnstile />
       {state.error ? <p className="field-error">{state.error}</p> : null}
       <button className="button" type="submit" disabled={pending}>
         {pending ? "Creating…" : "Create account"}

@@ -71,6 +71,18 @@ nano .env
 DATABASE_URL="file:./dev.db"
 AUTH_SECRET="paste output of: openssl rand -base64 32"
 ADMIN_EMAILS="you@example.com"
+
+# CAPTCHA on login/signup — get keys from the Turnstile tab of your
+# Cloudflare dashboard once the domain is on Cloudflare. Leave both unset
+# to run without a CAPTCHA (not recommended for production).
+NEXT_PUBLIC_TURNSTILE_SITE_KEY="your-turnstile-site-key"
+TURNSTILE_SECRET_KEY="your-turnstile-secret-key"
+
+# Required for the admin "Send password reset" button to actually deliver
+# email. Get an API key at resend.com and verify stamp.rip as a sending
+# domain there (Resend walks you through the DNS records).
+RESEND_API_KEY="your-resend-api-key"
+RESEND_FROM_EMAIL="Stamp <noreply@stamp.rip>"
 ```
 
 Generate the secret first:
@@ -80,6 +92,8 @@ openssl rand -base64 32
 ```
 
 **Don't reuse the `AUTH_SECRET` from local development** — it's a shared dev value, not a real secret.
+
+Turnstile and Resend are both optional at this step — the CAPTCHA and reset-email features degrade gracefully without them (see Known gaps in README.md), so you can come back and fill these in once the Cloudflare/Resend accounts are set up rather than blocking the rest of the deploy on them.
 
 ## 7. Set up the database
 
@@ -204,3 +218,5 @@ crontab -e
 | `EACCES: permission denied` writing to `dev.db` or `storage` | The process user doesn't own those paths — re-check step 9, or that PM2 is running as the `stamp` user (`pm2 status` shows the user) |
 | Port 3000 already in use | Something else is bound to it — `sudo lsof -i :3000`, or change `PORT` in `ecosystem.config.js` and update the nginx `proxy_pass` to match |
 | `npm run build` fails with `Module not found: Can't resolve '@/app/generated/prisma/client'` | The generated Prisma client is missing — it's gitignored on purpose (it's build output, not source). `npm ci` regenerates it automatically via `postinstall`; if that got skipped, run `npx prisma generate` directly |
+| Login/signup show "Verification failed" for real users | `TURNSTILE_SITE_KEY`/`TURNSTILE_SECRET_KEY` don't match the same Turnstile widget in your Cloudflare dashboard, or the domain the widget is scoped to doesn't match `stamp.rip` |
+| Admin's "Send password reset" shows "Couldn't send the email" | `RESEND_API_KEY` is missing/invalid, or `RESEND_FROM_EMAIL`'s domain isn't verified in Resend yet — check `pm2 logs stamp` for the underlying Resend error |

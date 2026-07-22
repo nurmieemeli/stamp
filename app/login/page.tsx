@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { Turnstile } from "@/components/Turnstile";
 import { loginAction, type LoginState } from "./actions";
 
 const initialState: LoginState = { error: "" };
@@ -23,6 +24,7 @@ export default function LoginPage() {
             <label htmlFor="password">Password</label>
             <input id="password" name="password" type="password" required autoComplete="current-password" />
           </div>
+          <Turnstile />
           {state.error ? <p className="field-error">{state.error}</p> : null}
           <button className="button" type="submit" disabled={pending}>
             {pending ? "Logging in…" : "Log in"}

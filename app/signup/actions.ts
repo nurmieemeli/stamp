@@ -6,6 +6,7 @@ import { signIn } from "@/lib/auth";
 import { normalizeUsername, validateUsername } from "@/lib/validation";
 import { Prisma } from "@/app/generated/prisma/client";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export type SignupState = { error: string };
 
@@ -14,10 +15,15 @@ export async function signupAction(_prev: SignupState, formData: FormData): Prom
   const username = normalizeUsername(String(formData.get("username") || ""));
   const password = String(formData.get("password") || "");
   const displayName = String(formData.get("displayName") || "").trim() || username;
+  const captchaToken = formData.get("cf-turnstile-response");
 
   const ip = await clientIp();
   if (!rateLimit(`signup:ip:${ip}`, 5, 60 * 60 * 1000)) {
     return { error: "Too many accounts created from this connection. Try again later." };
+  }
+
+  if (!(await verifyTurnstile(typeof captchaToken === "string" ? captchaToken : null, ip))) {
+    return { error: "Verification failed. Please try again." };
   }
 
   if (!email || !email.includes("@")) {

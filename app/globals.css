@@ -180,6 +180,10 @@ select:focus-visible {
   margin-bottom: 0;
 }
 
+.turnstile-field {
+  margin-bottom: 18px;
+}
+
 .hint {
   font-size: 0.75rem;
   color: var(--text-faint);

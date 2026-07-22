@@ -13,6 +13,7 @@ const RESERVED = new Set([
   "support",
   "report",
   "auth",
+  "reset-password",
 ]);
 
 export function normalizeUsername(input: string): string {

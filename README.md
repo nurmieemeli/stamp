@@ -14,6 +14,18 @@ Create `.env` (see `.env` in the repo for the current local values):
 DATABASE_URL="file:./dev.db"
 AUTH_SECRET="<random secret — regenerate before any real deployment>"
 ADMIN_EMAILS="admin@stamp.rip"   # comma-separated; these accounts get access to /admin
+
+# Optional — CAPTCHA on login/signup (Cloudflare Turnstile). Leave unset locally;
+# the widget and server-side check are both skipped when these aren't set.
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=""
+TURNSTILE_SECRET_KEY=""
+
+# Required for admin-triggered password reset emails to actually send.
+# Get an API key at resend.com; RESEND_FROM_EMAIL needs a domain verified
+# there (falls back to Resend's shared onboarding@resend.dev sender if unset,
+# which is fine for testing but shouldn't be used in production).
+RESEND_API_KEY=""
+RESEND_FROM_EMAIL="Stamp <noreply@stamp.rip>"
 ```
 
 Set up the database:
@@ -35,7 +47,8 @@ npm run dev
 - `/signup`, `/login` — credentials auth
 - `/dashboard` — the logged-in member's editor (identity, links, badges are read-only here)
 - `/[username]` — public profile page
-- `/admin`, `/admin/[username]` — badge grants, gated by `ADMIN_EMAILS`
+- `/admin`, `/admin/[username]` — member account/profile editing, badge grants, and triggering password reset emails, gated by `ADMIN_EMAILS`
+- `/reset-password/[token]` — where a member lands after clicking an admin-triggered reset email; sets a new password
 - `lib/platforms.ts` — the fixed catalog of link platforms and how each one's URL is built from a handle
 - `lib/palettes.ts` — the five color palettes (Amber, Nord, Dracula, Forest, Paper) members pick for their public page; applied as CSS custom properties scoped to the profile `.window`, independent of the app's own fixed dark chrome
 - `components/ProfileView.tsx` — the single render used by both the public page and the dashboard's live preview
@@ -72,4 +85,4 @@ Auth won't work without HTTPS (the session cookie is marked `Secure` in producti
 
 ## Known gaps
 
-This is an early-stage build. Not yet handled: audio file uploads (the "now spinning" field is text-only), OAuth login, an owner-facing analytics dashboard beyond the raw view count, and pagination on `/admin`'s member list. Rate limiting on auth is a simple in-memory limiter (`lib/rate-limit.ts`) — fine for a single process, not for a multi-instance deployment. Avatar/database storage is local disk — back it up yourself; there's no managed persistence.
+This is an early-stage build. Not yet handled: audio file uploads (the "now spinning" field is text-only), OAuth login, self-service ("forgot password") reset — resets are admin-triggered only, an owner-facing analytics dashboard beyond the raw view count, and pagination on `/admin`'s member list. Rate limiting on auth is a simple in-memory limiter (`lib/rate-limit.ts`) — fine for a single process, not for a multi-instance deployment. Avatar/database storage is local disk — back it up yourself; there's no managed persistence. Password reset tokens are single-use and expire after an hour but existing logged-in sessions aren't revoked on reset (JWT sessions are stateless, so there's nothing server-side to invalidate).
