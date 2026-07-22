@@ -1424,21 +1424,6 @@ a.track-title:hover {
   text-decoration: underline;
 }
 
-.statusbar .cursor {
-  display: inline-block;
-  width: 6px;
-  height: 12px;
-  background: var(--accent);
-  animation: blink 1s step-end infinite;
-  margin-left: auto;
-}
-
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
-}
-
 @media (max-width: 480px) {
   .identity {
     flex-direction: column;
