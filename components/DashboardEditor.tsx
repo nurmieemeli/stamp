@@ -353,9 +353,7 @@ export function DashboardEditor({
 
       <div className="preview-frame">
         <p className="preview-label">Live preview</p>
-        <div className="preview-scale">
-          <ProfileView profile={previewProfile} />
-        </div>
+        <ProfileView profile={previewProfile} />
       </div>
     </div>
   );

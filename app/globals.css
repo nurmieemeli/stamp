@@ -589,11 +589,6 @@ select:focus-visible {
   margin-bottom: 10px;
 }
 
-.preview-scale {
-  transform: scale(0.86);
-  transform-origin: top center;
-}
-
 @media (max-width: 860px) {
   .dashboard-shell {
     grid-template-columns: 1fr;
