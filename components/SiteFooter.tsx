@@ -1,15 +1,11 @@
-import Link from "next/link";
-
 export function SiteFooter() {
-  const year = new Date().getFullYear();
-
   return (
     <footer className="site-footer">
-      <Link href="/" className="wordmark">
-        Stamp
-      </Link>
       <span className="site-footer-meta">
-        &copy; {year} Stamp &middot; <a href="mailto:report@stamp.rip">report@stamp.rip</a>
+        Need support?{" "}
+        <a href="https://discord.gg/Mc6g2es2y4" target="_blank" rel="noopener noreferrer">
+          Join our discord!
+        </a>
       </span>
     </footer>
   );
