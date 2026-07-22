@@ -1,13 +1,30 @@
 import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { signOutAction } from "@/app/dashboard/actions";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth();
+
   return (
     <>
       <header className="site-header">
         <span className="wordmark">Stamp</span>
         <nav>
-          <Link href="/login">Log in</Link>
-          <Link href="/signup">Claim your page</Link>
+          {session?.user ? (
+            <>
+              <Link href="/dashboard">Dashboard</Link>
+              <form action={signOutAction}>
+                <button className="button-ghost button-small" type="submit">
+                  Log out
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link href="/login">Log in</Link>
+              <Link href="/signup">Claim your page</Link>
+            </>
+          )}
         </nav>
       </header>
       <main className="site-main">
