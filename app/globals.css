@@ -1392,11 +1392,21 @@ a.track-title:hover {
 }
 
 .statusbar-path {
-  color: var(--accent);
-  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: normal;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.statusbar-path b {
+  color: var(--text);
+  font-weight: 400;
+}
+
+.statusbar-path b::before {
+  content: "stamp://";
+  color: var(--text-faint);
 }
 
 .statusbar a {
