@@ -59,6 +59,7 @@ export default async function AdminPage({
               <Link key={u.id} href={`/admin/${u.username}`} className="admin-row">
                 <span className="admin-row-name">{u.profile?.displayName || u.username}</span>
                 <span className="admin-row-handle">@{u.username}</span>
+                {u.isPro ? <span className="admin-row-pro">Pro</span> : null}
                 <span className="admin-row-badges">
                   {u.profile && u.profile.badges.length > 0
                     ? u.profile.badges.map((b) => b.badge.label).join(" · ")

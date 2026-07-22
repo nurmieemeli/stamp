@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { isAdminEmail } from "@/lib/admin";
 import { AdminBadgeEditor } from "@/components/AdminBadgeEditor";
 import { AdminUserEditor } from "@/components/AdminUserEditor";
+import { AdminProStatus } from "@/components/AdminProStatus";
 import { AdminPasswordReset } from "@/components/AdminPasswordReset";
 import { AdminDeleteUser } from "@/components/AdminDeleteUser";
 
@@ -49,6 +50,7 @@ export default async function AdminUserPage({ params }: { params: Promise<Params
             palette: user.profile.palette,
           }}
         />
+        <AdminProStatus username={user.username} initialIsPro={user.isPro} />
         <AdminPasswordReset username={user.username} />
         <AdminBadgeEditor
           username={user.username}

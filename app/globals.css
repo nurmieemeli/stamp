@@ -951,6 +951,16 @@ select:focus-visible {
   flex-shrink: 0;
 }
 
+.admin-row-pro {
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+
 .admin-row-badges {
   font-size: 0.75rem;
   color: var(--text-muted);

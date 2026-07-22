@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { isAdminEmail } from "@/lib/admin";
 import { normalizeUsername, validateUsername, validateCleanText } from "@/lib/validation";
-import { isValidPalette, DEFAULT_PALETTE } from "@/lib/palettes";
+import { isValidPalette, isProPalette, DEFAULT_PALETTE } from "@/lib/palettes";
 import { generateResetToken, RESET_TOKEN_TTL_MS } from "@/lib/reset-token";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { baseUrl } from "@/lib/url";
@@ -44,6 +44,48 @@ export async function setUserBadgesAction(username: string, badgeKeys: string[])
   revalidatePath("/admin");
 
   return { error: "", savedAt: Date.now() };
+}
+
+export type SetProStatusState = { error: string; isPro: boolean | null };
+
+export async function setProStatusAction(username: string, isPro: boolean): Promise<SetProStatusState> {
+  const session = await auth();
+  if (!session?.user || !isAdminEmail(session.user.email)) {
+    return { error: "Not authorized.", isPro: null };
+  }
+
+  const user = await db.user.findUnique({ where: { username }, include: { profile: true } });
+  if (!user || !user.profile) {
+    return { error: "Member not found.", isPro: null };
+  }
+  const profile = user.profile;
+
+  await db.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: user.id },
+      data: { isPro, proPurchasedAt: isPro ? new Date() : null },
+    });
+
+    if (!isPro) {
+      // Revoking is more than flipping a flag — a previously Pro-only
+      // palette/custom accent would otherwise keep rendering forever, since
+      // ProfileView only re-checks isPro, not whether these specific values
+      // are still allowed for a free plan.
+      const revertData: { palette?: string; customAccent?: string } = {};
+      if (isProPalette(profile.palette)) revertData.palette = DEFAULT_PALETTE;
+      if (profile.customAccent) revertData.customAccent = "";
+      if (Object.keys(revertData).length > 0) {
+        await tx.profile.update({ where: { userId: user.id }, data: revertData });
+      }
+    }
+  });
+
+  revalidatePath(`/${username}`);
+  revalidatePath(`/admin/${username}`);
+  revalidatePath("/admin");
+  revalidatePath("/dashboard");
+
+  return { error: "", isPro };
 }
 
 export type AdminUserUpdatePayload = {
