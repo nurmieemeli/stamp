@@ -49,9 +49,7 @@ export default async function DashboardPage() {
           joinYear={user.createdAt.getFullYear()}
           initialProfile={{
             displayName: profile.displayName,
-            eyebrow: profile.eyebrow,
             bio: profile.bio,
-            bioSecondary: profile.bioSecondary,
             trackTitle: profile.trackTitle,
             trackArtist: profile.trackArtist,
             trackPreviewUrl: profile.trackPreviewUrl,

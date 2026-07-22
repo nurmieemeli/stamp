@@ -69,9 +69,7 @@ model Profile {
   user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId          String         @unique
   displayName     String
-  eyebrow         String         @default("")
   bio             String         @default("")
-  bioSecondary    String         @default("")
   trackTitle      String         @default("")
   trackArtist     String         @default("")
   trackPreviewUrl String         @default("")

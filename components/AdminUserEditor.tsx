@@ -9,9 +9,7 @@ type InitialUser = {
   username: string;
   email: string;
   displayName: string;
-  eyebrow: string;
   bio: string;
-  bioSecondary: string;
   palette: string;
 };
 
@@ -20,9 +18,7 @@ export function AdminUserEditor({ initialUser }: { initialUser: InitialUser }) {
   const [username, setUsername] = useState(initialUser.username);
   const [email, setEmail] = useState(initialUser.email);
   const [displayName, setDisplayName] = useState(initialUser.displayName);
-  const [eyebrow, setEyebrow] = useState(initialUser.eyebrow);
   const [bio, setBio] = useState(initialUser.bio);
-  const [bioSecondary, setBioSecondary] = useState(initialUser.bioSecondary);
   const [palette, setPalette] = useState(initialUser.palette);
 
   const [isPending, startTransition] = useTransition();
@@ -35,9 +31,7 @@ export function AdminUserEditor({ initialUser }: { initialUser: InitialUser }) {
         newUsername: username,
         email,
         displayName,
-        eyebrow,
         bio,
-        bioSecondary,
         palette,
       });
       setStatus(result);
@@ -67,16 +61,8 @@ export function AdminUserEditor({ initialUser }: { initialUser: InitialUser }) {
         <input id="admin-displayName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
       </div>
       <div className="field">
-        <label htmlFor="admin-eyebrow">Role / location</label>
-        <input id="admin-eyebrow" value={eyebrow} onChange={(e) => setEyebrow(e.target.value)} />
-      </div>
-      <div className="field">
         <label htmlFor="admin-bio">Bio</label>
-        <textarea id="admin-bio" value={bio} onChange={(e) => setBio(e.target.value)} />
-      </div>
-      <div className="field">
-        <label htmlFor="admin-bioSecondary">Bio, line two</label>
-        <textarea id="admin-bioSecondary" value={bioSecondary} onChange={(e) => setBioSecondary(e.target.value)} />
+        <textarea id="admin-bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} />
       </div>
       <div className="field">
         <label htmlFor="admin-palette">Palette</label>

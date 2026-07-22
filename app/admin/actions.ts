@@ -51,9 +51,7 @@ export type AdminUserUpdatePayload = {
   newUsername: string;
   email: string;
   displayName: string;
-  eyebrow: string;
   bio: string;
-  bioSecondary: string;
   palette: string;
 };
 
@@ -88,9 +86,7 @@ export async function updateUserDetailsAction(payload: AdminUserUpdatePayload): 
 
   const textFields: [string, string][] = [
     ["Display name", displayName],
-    ["Role / location", payload.eyebrow],
     ["Bio", payload.bio],
-    ["Bio, line two", payload.bioSecondary],
   ];
   for (const [label, value] of textFields) {
     const textError = validateCleanText(label, value);
@@ -109,9 +105,7 @@ export async function updateUserDetailsAction(payload: AdminUserUpdatePayload): 
         where: { userId: user.id },
         data: {
           displayName,
-          eyebrow: payload.eyebrow.trim(),
           bio: payload.bio.trim(),
-          bioSecondary: payload.bioSecondary.trim(),
           palette,
         },
       }),

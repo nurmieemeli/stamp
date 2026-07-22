@@ -23,9 +23,7 @@ export async function signOutAction() {
 
 export type SaveProfilePayload = {
   displayName: string;
-  eyebrow: string;
   bio: string;
-  bioSecondary: string;
   trackTitle: string;
   trackArtist: string;
   trackPreviewUrl: string;
@@ -54,9 +52,7 @@ export async function saveProfileAction(payload: SaveProfilePayload): Promise<Sa
 
   const textFields: [string, string][] = [
     ["Display name", displayName],
-    ["Role / location", payload.eyebrow],
     ["Bio", payload.bio],
-    ["Bio, line two", payload.bioSecondary],
     ["Now spinning", payload.trackTitle],
     ...links.map((l): [string, string] => ["A link", l.value]),
   ];
@@ -82,9 +78,7 @@ export async function saveProfileAction(payload: SaveProfilePayload): Promise<Sa
       where: { userId },
       data: {
         displayName,
-        eyebrow: payload.eyebrow.trim(),
         bio: payload.bio.trim(),
-        bioSecondary: payload.bioSecondary.trim(),
         trackTitle: payload.trackTitle.trim(),
         trackArtist: payload.trackArtist.trim(),
         trackPreviewUrl: payload.trackPreviewUrl.trim(),

@@ -32,14 +32,11 @@ export function ProfileView({ profile }: { profile: ProfileData }) {
           <div className="identity-meta">
             <p className="id-name">{profile.displayName || profile.username}</p>
             <span className="id-handle">@{profile.username}</span>
-            <p className="id-role">
-              {profile.eyebrow ? `${profile.eyebrow} · ` : ""}since {profile.joinYear}
-            </p>
+            <p className="id-role">since {profile.joinYear}</p>
           </div>
         </section>
 
         {profile.bio ? <p className="bio">{profile.bio}</p> : null}
-        {profile.bioSecondary ? <p className="bio">{profile.bioSecondary}</p> : null}
 
         <NowSpinning
           trackTitle={profile.trackTitle}

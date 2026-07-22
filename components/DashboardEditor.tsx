@@ -24,9 +24,7 @@ type EditableLink = { id: string; platform: string; value: string };
 
 type InitialProfile = {
   displayName: string;
-  eyebrow: string;
   bio: string;
-  bioSecondary: string;
   trackTitle: string;
   trackArtist: string;
   trackPreviewUrl: string;
@@ -55,9 +53,7 @@ export function DashboardEditor({
   initialProfile: InitialProfile;
 }) {
   const [displayName, setDisplayName] = useState(initialProfile.displayName);
-  const [eyebrow, setEyebrow] = useState(initialProfile.eyebrow);
   const [bio, setBio] = useState(initialProfile.bio);
-  const [bioSecondary, setBioSecondary] = useState(initialProfile.bioSecondary);
   const [selectedTrack, setSelectedTrack] = useState<TrackResult | null>(
     initialProfile.trackTitle
       ? {
@@ -109,9 +105,7 @@ export function DashboardEditor({
     () => ({
       username,
       displayName: displayName || username,
-      eyebrow,
       bio,
-      bioSecondary,
       trackTitle: selectedTrack?.title ?? "",
       trackArtist: selectedTrack?.artist ?? "",
       trackPreviewUrl: selectedTrack?.previewUrl ?? "",
@@ -132,9 +126,7 @@ export function DashboardEditor({
     [
       username,
       displayName,
-      eyebrow,
       bio,
-      bioSecondary,
       selectedTrack,
       avatarPreview,
       avatarUrl,
@@ -204,9 +196,7 @@ export function DashboardEditor({
   function handleSave() {
     const payload: SaveProfilePayload = {
       displayName,
-      eyebrow,
       bio,
-      bioSecondary,
       trackTitle: selectedTrack?.title ?? "",
       trackArtist: selectedTrack?.artist ?? "",
       trackPreviewUrl: selectedTrack?.previewUrl ?? "",
@@ -299,25 +289,8 @@ export function DashboardEditor({
             <input id="displayName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
           </div>
           <div className="field">
-            <label htmlFor="eyebrow">Role / location</label>
-            <input
-              id="eyebrow"
-              value={eyebrow}
-              onChange={(e) => setEyebrow(e.target.value)}
-              placeholder="Sound Archivist — Bristol, UK"
-            />
-          </div>
-          <div className="field">
             <label htmlFor="bio">Bio</label>
-            <textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} />
-          </div>
-          <div className="field">
-            <label htmlFor="bioSecondary">Bio, line two (optional)</label>
-            <textarea
-              id="bioSecondary"
-              value={bioSecondary}
-              onChange={(e) => setBioSecondary(e.target.value)}
-            />
+            <textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} />
           </div>
         </div>
 

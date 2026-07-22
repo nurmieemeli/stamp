@@ -1088,6 +1088,7 @@ select:focus-visible {
   line-height: 1.75;
   margin: 0 0 6px;
   max-width: 56ch;
+  white-space: pre-line;
   animation: fade-in-up 0.4s ease-out both;
   animation-delay: 60ms;
 }

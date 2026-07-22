@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
   return {
     title: `${user.profile.displayName || user.username} · stamp.rip`,
-    description: user.profile.bio || `${user.username}'s page on Stamp.`,
+    description: user.profile.bio.split("\n")[0] || `${user.username}'s page on Stamp.`,
   };
 }
 
@@ -71,9 +71,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<Pa
   const profileData: ProfileData = {
     username: user.username,
     displayName: profile.displayName,
-    eyebrow: profile.eyebrow,
     bio: profile.bio,
-    bioSecondary: profile.bioSecondary,
     trackTitle: profile.trackTitle,
     trackArtist: profile.trackArtist,
     trackPreviewUrl: profile.trackPreviewUrl,

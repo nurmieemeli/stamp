@@ -45,9 +45,7 @@ export default async function AdminUserPage({ params }: { params: Promise<Params
             username: user.username,
             email: user.email,
             displayName: user.profile.displayName,
-            eyebrow: user.profile.eyebrow,
             bio: user.profile.bio,
-            bioSecondary: user.profile.bioSecondary,
             palette: user.profile.palette,
           }}
         />

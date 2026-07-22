@@ -14,9 +14,7 @@ export type ProfileBadgeView = {
 export type ProfileData = {
   username: string;
   displayName: string;
-  eyebrow: string;
   bio: string;
-  bioSecondary: string;
   trackTitle: string;
   trackArtist: string;
   trackPreviewUrl: string;
