@@ -47,8 +47,9 @@ npm run dev
 - `/signup`, `/login` — credentials auth
 - `/dashboard` — the logged-in member's editor (identity, links, badges are read-only here)
 - `/[username]` — public profile page
-- `/admin`, `/admin/[username]` — member account/profile editing, badge grants, and triggering password reset emails, gated by `ADMIN_EMAILS`
-- `/reset-password/[token]` — where a member lands after clicking an admin-triggered reset email; sets a new password
+- `/admin`, `/admin/[username]` — member account/profile editing, badge grants, triggering password reset emails, and deleting accounts, gated by `ADMIN_EMAILS`
+- `/forgot-password` — self-service: a member requests their own reset link by email
+- `/reset-password/[token]` — where a member lands after a reset email (self-requested or admin-triggered); sets a new password
 - `lib/platforms.ts` — the fixed catalog of link platforms and how each one's URL is built from a handle
 - `lib/palettes.ts` — the five color palettes (Amber, Nord, Dracula, Forest, Paper) members pick for their public page; applied as CSS custom properties scoped to the profile `.window`, independent of the app's own fixed dark chrome
 - `components/ProfileView.tsx` — the single render used by both the public page and the dashboard's live preview
@@ -85,4 +86,4 @@ Auth won't work without HTTPS (the session cookie is marked `Secure` in producti
 
 ## Known gaps
 
-This is an early-stage build. Not yet handled: audio file uploads (the "now spinning" field is text-only), OAuth login, self-service ("forgot password") reset — resets are admin-triggered only, an owner-facing analytics dashboard beyond the raw view count, and pagination on `/admin`'s member list. Rate limiting on auth is a simple in-memory limiter (`lib/rate-limit.ts`) — fine for a single process, not for a multi-instance deployment. Avatar/database storage is local disk — back it up yourself; there's no managed persistence. Password reset tokens are single-use and expire after an hour but existing logged-in sessions aren't revoked on reset (JWT sessions are stateless, so there's nothing server-side to invalidate).
+This is an early-stage build. Not yet handled: audio file uploads (the "now spinning" field is text-only), OAuth login, an owner-facing analytics dashboard beyond the raw view count, and pagination on `/admin`'s member list. Rate limiting on auth is a simple in-memory limiter (`lib/rate-limit.ts`) — fine for a single process, not for a multi-instance deployment. Avatar/database storage is local disk — back it up yourself; there's no managed persistence. Password reset tokens are single-use and expire after an hour but existing logged-in sessions aren't revoked on reset (JWT sessions are stateless, so there's nothing server-side to invalidate). Deleting a member from `/admin` is permanent and immediate — no soft-delete or recovery window.

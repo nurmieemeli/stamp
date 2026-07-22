@@ -6,6 +6,7 @@ import { isAdminEmail } from "@/lib/admin";
 import { AdminBadgeEditor } from "@/components/AdminBadgeEditor";
 import { AdminUserEditor } from "@/components/AdminUserEditor";
 import { AdminPasswordReset } from "@/components/AdminPasswordReset";
+import { AdminDeleteUser } from "@/components/AdminDeleteUser";
 
 type Params = { username: string };
 
@@ -57,6 +58,7 @@ export default async function AdminUserPage({ params }: { params: Promise<Params
           allBadges={allBadges.map((b) => ({ key: b.key, label: b.label }))}
           initialBadgeKeys={user.profile.badges.map((b) => b.badge.key)}
         />
+        <AdminDeleteUser username={user.username} />
       </main>
     </>
   );

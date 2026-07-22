@@ -9,6 +9,7 @@ import { isValidPalette, DEFAULT_PALETTE } from "@/lib/palettes";
 import { generateResetToken, RESET_TOKEN_TTL_MS } from "@/lib/reset-token";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { baseUrl } from "@/lib/url";
+import { deleteAvatarFile } from "@/lib/avatar-storage";
 import { Prisma } from "@/app/generated/prisma/client";
 
 export type AdminSaveState = { error: string; savedAt: number | null };
@@ -154,4 +155,35 @@ export async function adminResetPasswordAction(username: string): Promise<AdminR
   }
 
   return { error: "", sentTo: user.email };
+}
+
+export type AdminDeleteUserState = { error: string; deleted: boolean };
+
+export async function deleteUserAction(username: string): Promise<AdminDeleteUserState> {
+  const session = await auth();
+  if (!session?.user || !isAdminEmail(session.user.email)) {
+    return { error: "Not authorized.", deleted: false };
+  }
+
+  const user = await db.user.findUnique({ where: { username }, include: { profile: true } });
+  if (!user) {
+    return { error: "Member not found.", deleted: false };
+  }
+
+  if (user.email.toLowerCase() === session.user.email?.toLowerCase()) {
+    return { error: "You can't delete your own account.", deleted: false };
+  }
+
+  // Cascades to Profile, Link, ProfileBadge, and PasswordResetToken via the
+  // FK constraints in the schema — only the avatar file needs cleaning up
+  // separately since it lives on disk, not in the database.
+  await db.user.delete({ where: { id: user.id } });
+  if (user.profile?.avatarUrl) {
+    await deleteAvatarFile(user.profile.avatarUrl);
+  }
+
+  revalidatePath(`/${username}`);
+  revalidatePath("/admin");
+
+  return { error: "", deleted: true };
 }

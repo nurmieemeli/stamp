@@ -39,5 +39,6 @@ describe("validateUsername", () => {
     expect(validateUsername("admin")).not.toBeNull();
     expect(validateUsername("dashboard")).not.toBeNull();
     expect(validateUsername("reset-password")).not.toBeNull();
+    expect(validateUsername("forgot-password")).not.toBeNull();
   });
 });

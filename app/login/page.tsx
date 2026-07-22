@@ -23,6 +23,9 @@ export default function LoginPage() {
           <div className="field">
             <label htmlFor="password">Password</label>
             <input id="password" name="password" type="password" required autoComplete="current-password" />
+            <span className="hint">
+              <Link href="/forgot-password">Forgot your password?</Link>
+            </span>
           </div>
           <Turnstile />
           {state.error ? <p className="field-error">{state.error}</p> : null}

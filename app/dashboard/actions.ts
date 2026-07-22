@@ -1,6 +1,6 @@
 "use server";
 
-import { mkdir, unlink, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import sharp from "sharp";
@@ -9,17 +9,10 @@ import { auth, signOut } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { isKnownPlatform } from "@/lib/platforms";
 import { isValidPalette, DEFAULT_PALETTE } from "@/lib/palettes";
-import { AVATAR_DIR } from "@/lib/avatar-storage";
+import { AVATAR_DIR, deleteAvatarFile } from "@/lib/avatar-storage";
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 const AVATAR_DIMENSION = 800;
-
-async function deleteAvatarFile(avatarUrl: string) {
-  if (!avatarUrl) return;
-  const filename = avatarUrl.split("/").pop();
-  if (!filename) return;
-  await unlink(path.join(AVATAR_DIR, filename)).catch(() => {});
-}
 
 export async function signOutAction() {
   await signOut({ redirectTo: "/" });
