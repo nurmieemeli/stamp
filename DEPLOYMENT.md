@@ -58,7 +58,7 @@ rsync -avz --exclude node_modules --exclude .next --exclude dev.db --exclude .en
 npm ci
 ```
 
-`npm ci` uses `package-lock.json` for a reproducible install (same versions you tested locally).
+`npm ci` uses `package-lock.json` for a reproducible install (same versions you tested locally). This also runs `prisma generate` automatically via a `postinstall` hook — if you ever see `Module not found: Can't resolve '@/app/generated/prisma/client'`, that step didn't run (e.g. `npm ci --ignore-scripts`); fix with `npx prisma generate`.
 
 ## 6. Configure environment variables
 
@@ -203,3 +203,4 @@ crontab -e
 | `UntrustedHost` error in `pm2 logs stamp` | Shouldn't happen — `trustHost: true` is already set in `lib/auth.ts` for exactly this. If you see it, confirm you're running the code from this repo, not an older checkout |
 | `EACCES: permission denied` writing to `dev.db` or `public/uploads` | The process user doesn't own those paths — re-check step 9, or that PM2 is running as the `stamp` user (`pm2 status` shows the user) |
 | Port 3000 already in use | Something else is bound to it — `sudo lsof -i :3000`, or change `PORT` in `ecosystem.config.js` and update the nginx `proxy_pass` to match |
+| `npm run build` fails with `Module not found: Can't resolve '@/app/generated/prisma/client'` | The generated Prisma client is missing — it's gitignored on purpose (it's build output, not source). `npm ci` regenerates it automatically via `postinstall`; if that got skipped, run `npx prisma generate` directly |
