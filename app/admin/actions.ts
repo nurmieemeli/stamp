@@ -136,8 +136,8 @@ export async function adminResetPasswordAction(username: string): Promise<AdminR
     return { error: "Not authorized.", sentTo: null };
   }
 
-  const user = await db.user.findUnique({ where: { username } });
-  if (!user) {
+  const user = await db.user.findUnique({ where: { username }, include: { profile: true } });
+  if (!user || !user.profile) {
     return { error: "Member not found.", sentTo: null };
   }
 
@@ -146,10 +146,18 @@ export async function adminResetPasswordAction(username: string): Promise<AdminR
     data: { userId: user.id, tokenHash, expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS) },
   });
 
-  const resetUrl = `${await baseUrl()}/reset-password/${token}`;
+  const origin = await baseUrl();
+  const resetUrl = `${origin}/reset-password/${token}`;
+  const avatarUrl = user.profile.avatarUrl ? `${origin}${user.profile.avatarUrl}` : null;
 
   try {
-    await sendPasswordResetEmail(user.email, resetUrl);
+    await sendPasswordResetEmail({
+      to: user.email,
+      resetUrl,
+      displayName: user.profile.displayName || user.username,
+      avatarUrl,
+      reason: "admin",
+    });
   } catch (err) {
     console.error("admin reset-password: failed to send email", err);
     return { error: "Couldn't send the email — check the email service configuration.", sentTo: null };

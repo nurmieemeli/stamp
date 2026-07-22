@@ -31,18 +31,26 @@ export async function forgotPasswordAction(
     return { error: "Enter a valid email address.", submitted: false };
   }
 
-  const user = await db.user.findUnique({ where: { email } });
-  if (user) {
+  const user = await db.user.findUnique({ where: { email }, include: { profile: true } });
+  if (user && user.profile) {
     const { token, tokenHash } = generateResetToken();
     await db.passwordResetToken.create({
       data: { userId: user.id, tokenHash, expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS) },
     });
-    const resetUrl = `${await baseUrl()}/reset-password/${token}`;
+    const origin = await baseUrl();
+    const resetUrl = `${origin}/reset-password/${token}`;
+    const avatarUrl = user.profile.avatarUrl ? `${origin}${user.profile.avatarUrl}` : null;
     // Failures are logged but not surfaced to the caller — the response
     // below stays identical whether or not the account exists, so this
     // endpoint can't be used to enumerate registered emails. Check server
     // logs (not the UI) if members report not receiving reset emails.
-    await sendPasswordResetEmail(user.email, resetUrl).catch((err) => {
+    await sendPasswordResetEmail({
+      to: user.email,
+      resetUrl,
+      displayName: user.profile.displayName || user.username,
+      avatarUrl,
+      reason: "self",
+    }).catch((err) => {
       console.error("forgot-password: failed to send reset email", err);
     });
   }
