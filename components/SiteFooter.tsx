@@ -1,12 +1,16 @@
 export function SiteFooter() {
+  const discordUrl = process.env.DISCORD_INVITE_URL;
+
   return (
     <footer className="site-footer">
-      <span className="site-footer-meta">
-        Need support?{" "}
-        <a href="https://discord.gg/Mc6g2es2y4" target="_blank" rel="noopener noreferrer">
-          Join our discord!
-        </a>
-      </span>
+      {discordUrl ? (
+        <span className="site-footer-meta">
+          Need support?{" "}
+          <a href={discordUrl} target="_blank" rel="noopener noreferrer">
+            Join our discord!
+          </a>
+        </span>
+      ) : null}
     </footer>
   );
 }
