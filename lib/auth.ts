@@ -13,7 +13,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // this, Auth.js rejects every request because it can't verify the Host
   // header itself, which it otherwise only trusts on platforms like Vercel.
   trustHost: true,
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    // Explicit rather than relying on the library default — members should
+    // stay signed in across visits, not just within a single browser session.
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   pages: { signIn: "/login" },
   providers: [
     Credentials({
