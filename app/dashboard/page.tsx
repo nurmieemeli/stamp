@@ -44,7 +44,7 @@ export default async function DashboardPage() {
           </form>
         </nav>
       </header>
-      <main className="site-main">
+      <main className="site-main site-main-wide">
         <h2>Edit your page</h2>
         <DashboardEditor
           username={user.username}

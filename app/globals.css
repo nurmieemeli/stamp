@@ -181,6 +181,12 @@ select:focus-visible {
   padding: 0 16px 80px;
 }
 
+/* Only the dashboard editor uses this — its two-column layout (settings +
+   live preview) gets cramped at the site-wide 880px reading width. */
+.site-main-wide {
+  max-width: 1180px;
+}
+
 .site-footer {
   display: flex;
   align-items: center;
