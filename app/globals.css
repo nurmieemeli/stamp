@@ -428,7 +428,7 @@ select:focus-visible {
 
 @media (max-width: 640px) {
   .link-editor-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -595,7 +595,7 @@ select:focus-visible {
 
 @media (max-width: 860px) {
   .dashboard-shell {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .preview-frame {
     position: static;
@@ -649,6 +649,8 @@ select:focus-visible {
 .profile-page {
   display: flex;
   justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
   padding: clamp(24px, 6vw, 72px) 16px;
 }
 
