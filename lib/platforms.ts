@@ -152,3 +152,11 @@ export function resolveLinkUrl(platformKey: string, rawValue: string): string {
   const handle = value.replace(/^@+/, "").replace(/^https?:\/\/\S+$/i, "");
   return platform.buildUrl ? platform.buildUrl(handle) : value;
 }
+
+/** Strips scheme/trailing slash for display, e.g. "https://x.com/rhea/" -> "x.com/rhea". */
+export function displayUrl(url: string): string {
+  return url
+    .replace(/^https?:\/\//i, "")
+    .replace(/^mailto:/i, "")
+    .replace(/\/$/, "");
+}

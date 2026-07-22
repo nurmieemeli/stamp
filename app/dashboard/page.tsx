@@ -53,6 +53,7 @@ export default async function DashboardPage() {
             bioSecondary: profile.bioSecondary,
             trackTitle: profile.trackTitle,
             avatarUrl: profile.avatarUrl,
+            palette: profile.palette,
             viewCount: profile.viewCount,
             links: profile.links.map((l) => ({
               id: l.id,

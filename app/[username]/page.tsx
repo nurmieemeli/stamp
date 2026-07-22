@@ -4,7 +4,8 @@ import { after } from "next/server";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { ProfileView } from "@/components/ProfileView";
-import { getPlatformLabel, resolveLinkUrl } from "@/lib/platforms";
+import { getPlatformLabel, resolveLinkUrl, displayUrl } from "@/lib/platforms";
+import { getPalette } from "@/lib/palettes";
 import type { ProfileData } from "@/lib/types";
 
 type Params = { username: string };
@@ -60,18 +61,20 @@ export default async function PublicProfilePage({ params }: { params: Promise<Pa
     bioSecondary: profile.bioSecondary,
     trackTitle: profile.trackTitle,
     avatarUrl: profile.avatarUrl,
+    paletteKey: profile.palette,
     viewCount: profile.viewCount + 1,
     joinYear: user.createdAt.getFullYear(),
     badges: profile.badges.map((pb) => ({ key: pb.badge.key, label: pb.badge.label })),
-    links: profile.links.map((l) => ({
-      id: l.id,
-      label: getPlatformLabel(l.platform),
-      url: resolveLinkUrl(l.platform, l.value),
-    })),
+    links: profile.links.map((l) => {
+      const url = resolveLinkUrl(l.platform, l.value);
+      return { id: l.id, label: getPlatformLabel(l.platform), sub: displayUrl(url), url };
+    }),
   };
 
+  const pageBg = getPalette(profile.palette).pageBg;
+
   return (
-    <div className="sheet-page">
+    <div className="profile-page" style={{ background: pageBg }}>
       <ProfileView profile={profileData} />
     </div>
   );

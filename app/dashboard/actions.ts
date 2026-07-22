@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { auth, signOut } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { isKnownPlatform } from "@/lib/platforms";
+import { isValidPalette, DEFAULT_PALETTE } from "@/lib/palettes";
 import { AVATAR_DIR } from "@/lib/avatar-storage";
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
@@ -30,6 +31,7 @@ export type SaveProfilePayload = {
   bio: string;
   bioSecondary: string;
   trackTitle: string;
+  palette: string;
   links: { platform: string; value: string }[];
 };
 
@@ -50,6 +52,8 @@ export async function saveProfileAction(payload: SaveProfilePayload): Promise<Sa
     .filter((l) => isKnownPlatform(l.platform) && l.value.trim())
     .map((l) => ({ platform: l.platform, value: l.value.trim() }));
 
+  const palette = isValidPalette(payload.palette) ? payload.palette : DEFAULT_PALETTE;
+
   const userId = session.user.id;
 
   await db.$transaction(async (tx) => {
@@ -61,6 +65,7 @@ export async function saveProfileAction(payload: SaveProfilePayload): Promise<Sa
         bio: payload.bio.trim(),
         bioSecondary: payload.bioSecondary.trim(),
         trackTitle: payload.trackTitle.trim(),
+        palette,
       },
     });
 

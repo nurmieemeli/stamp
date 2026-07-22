@@ -31,6 +31,7 @@ model Profile {
   bioSecondary String         @default("")
   trackTitle   String         @default("")
   avatarUrl    String         @default("")
+  palette      String         @default("amber")
   viewCount    Int            @default(0)
   links        Link[]
   badges       ProfileBadge[]

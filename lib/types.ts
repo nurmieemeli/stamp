@@ -1,6 +1,7 @@
 export type ProfileLink = {
   id: string;
   label: string;
+  sub: string;
   url: string;
 };
 
@@ -17,6 +18,7 @@ export type ProfileData = {
   bioSecondary: string;
   trackTitle: string;
   avatarUrl: string;
+  paletteKey: string;
   viewCount: number;
   joinYear: number;
   badges: ProfileBadgeView[];

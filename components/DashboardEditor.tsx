@@ -10,7 +10,8 @@ import {
   type SaveState,
   type AvatarState,
 } from "@/app/dashboard/actions";
-import { PLATFORMS, getPlatform, getPlatformLabel, resolveLinkUrl } from "@/lib/platforms";
+import { PLATFORMS, getPlatform, getPlatformLabel, resolveLinkUrl, displayUrl } from "@/lib/platforms";
+import { PALETTES, DEFAULT_PALETTE } from "@/lib/palettes";
 import type { ProfileData } from "@/lib/types";
 
 const MAX_AVATAR_BYTES = 8 * 1024 * 1024;
@@ -25,6 +26,7 @@ type InitialProfile = {
   bioSecondary: string;
   trackTitle: string;
   avatarUrl: string;
+  palette: string;
   viewCount: number;
   links: EditableLink[];
   badges: { key: string; label: string }[];
@@ -53,6 +55,7 @@ export function DashboardEditor({
   const [links, setLinks] = useState<EditableLink[]>(initialProfile.links);
   const [avatarUrl, setAvatarUrl] = useState(initialProfile.avatarUrl);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [paletteKey, setPaletteKey] = useState(initialProfile.palette || DEFAULT_PALETTE);
   const [avatarStatus, setAvatarStatus] = useState<AvatarState>({ error: "", avatarUrl: null });
   const [isAvatarPending, startAvatarTransition] = useTransition();
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -69,12 +72,16 @@ export function DashboardEditor({
       bioSecondary,
       trackTitle,
       avatarUrl: avatarPreview ?? avatarUrl,
+      paletteKey,
       viewCount: initialProfile.viewCount,
       joinYear,
       badges: initialProfile.badges,
       links: links
         .filter((l) => l.value.trim())
-        .map((l) => ({ id: l.id, label: getPlatformLabel(l.platform), url: resolveLinkUrl(l.platform, l.value) })),
+        .map((l) => {
+          const url = resolveLinkUrl(l.platform, l.value);
+          return { id: l.id, label: getPlatformLabel(l.platform), sub: displayUrl(url), url };
+        }),
     }),
     [
       username,
@@ -85,6 +92,7 @@ export function DashboardEditor({
       trackTitle,
       avatarPreview,
       avatarUrl,
+      paletteKey,
       links,
       joinYear,
       initialProfile.viewCount,
@@ -154,6 +162,7 @@ export function DashboardEditor({
       bio,
       bioSecondary,
       trackTitle,
+      palette: paletteKey,
       links: links.map((l) => ({ platform: l.platform, value: l.value })),
     };
     startTransition(async () => {
@@ -209,6 +218,27 @@ export function DashboardEditor({
               <p className="hint">JPG, PNG, or WEBP. Up to 8MB — cropped to a square.</p>
               {avatarStatus.error ? <p className="field-error">{avatarStatus.error}</p> : null}
             </div>
+          </div>
+        </div>
+
+        <div className="panel">
+          <p className="panel-title">Palette</p>
+          <div className="palette-picker">
+            <div className="palette-swatches">
+              {PALETTES.map((p) => (
+                <button
+                  key={p.key}
+                  type="button"
+                  className="palette-swatch"
+                  aria-label={p.label}
+                  aria-pressed={p.key === paletteKey}
+                  onClick={() => setPaletteKey(p.key)}
+                >
+                  <span className="fill" style={{ background: p.tokens.accent }} />
+                </button>
+              ))}
+            </div>
+            <span className="palette-label">{PALETTES.find((p) => p.key === paletteKey)?.label}</span>
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getPlatformLabel, isKnownPlatform, resolveLinkUrl } from "./platforms";
+import { displayUrl, getPlatformLabel, isKnownPlatform, resolveLinkUrl } from "./platforms";
 
 describe("resolveLinkUrl", () => {
   it("builds a path-based handle URL", () => {
@@ -38,6 +38,20 @@ describe("resolveLinkUrl", () => {
   it("never lets an email-mode platform resolve to a non-mailto link (spoofing regression)", () => {
     const url = resolveLinkUrl("email", "https://evil.example.com/phish");
     expect(url.startsWith("mailto:")).toBe(true);
+  });
+});
+
+describe("displayUrl", () => {
+  it("strips the https scheme", () => {
+    expect(displayUrl("https://instagram.com/rhea")).toBe("instagram.com/rhea");
+  });
+
+  it("strips a trailing slash", () => {
+    expect(displayUrl("https://undertowtapes.com/")).toBe("undertowtapes.com");
+  });
+
+  it("strips mailto:", () => {
+    expect(displayUrl("mailto:rhea@undertow.tapes")).toBe("rhea@undertow.tapes");
   });
 });
 

@@ -1,6 +1,6 @@
 # Stamp
 
-A bio-link platform in the spirit of guns.lol, rebuilt with a restrained, editorial visual language instead of neon/glitch. Next.js (App Router) + TypeScript, Prisma on SQLite, NextAuth credentials auth.
+A bio-link platform in the spirit of guns.lol, rebuilt with a dark, technical, monospace-driven visual language instead of neon/glitch. Next.js (App Router) + TypeScript, Prisma on SQLite, NextAuth credentials auth.
 
 ## Setup
 
@@ -37,6 +37,7 @@ npm run dev
 - `/[username]` — public profile page
 - `/admin`, `/admin/[username]` — badge grants, gated by `ADMIN_EMAILS`
 - `lib/platforms.ts` — the fixed catalog of link platforms and how each one's URL is built from a handle
+- `lib/palettes.ts` — the five color palettes (Amber, Nord, Dracula, Forest, Paper) members pick for their public page; applied as CSS custom properties scoped to the profile `.window`, independent of the app's own fixed dark chrome
 - `components/ProfileView.tsx` — the single render used by both the public page and the dashboard's live preview
 
 ## Commands
@@ -71,4 +72,4 @@ Auth won't work without HTTPS (the session cookie is marked `Secure` in producti
 
 ## Known gaps
 
-This is an early-stage build. Not yet handled: audio file uploads (the "now spinning" field is text-only), OAuth login, multiple visual "editions," an owner-facing analytics dashboard beyond the raw view count, and pagination on `/admin`'s member list. Rate limiting on auth is a simple in-memory limiter (`lib/rate-limit.ts`) — fine for a single process, not for a multi-instance deployment. Avatar/database storage is local disk — back it up yourself; there's no managed persistence.
+This is an early-stage build. Not yet handled: audio file uploads (the "now spinning" field is text-only), OAuth login, an owner-facing analytics dashboard beyond the raw view count, and pagination on `/admin`'s member list. Rate limiting on auth is a simple in-memory limiter (`lib/rate-limit.ts`) — fine for a single process, not for a multi-instance deployment. Avatar/database storage is local disk — back it up yourself; there's no managed persistence.

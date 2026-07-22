@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const BAR_HEIGHTS = [9, 16, 6, 20, 11, 18, 8];
+const BAR_HEIGHTS = [5, 11, 4, 14, 8, 12, 6];
 
 export function NowSpinning({ trackTitle }: { trackTitle: string }) {
   const [playing, setPlaying] = useState(false);
@@ -13,15 +13,14 @@ export function NowSpinning({ trackTitle }: { trackTitle: string }) {
     <section className="spinning" aria-label="Now playing">
       <button
         type="button"
-        className={`play-toggle${playing ? " is-playing" : ""}`}
+        className="play-toggle"
         aria-pressed={playing}
         aria-label={playing ? "Pause preview" : `Play preview of ${trackTitle}`}
         onClick={() => setPlaying((p) => !p)}
       >
-        <span className="play-icon" />
+        {playing ? "⏸" : "▶"}
       </button>
       <div className="track-info">
-        <p className="track-label">Now spinning</p>
         <p className="track-title">{trackTitle}</p>
       </div>
       <div className={`bars${playing ? " is-playing" : ""}`} aria-hidden="true">
@@ -29,6 +28,7 @@ export function NowSpinning({ trackTitle }: { trackTitle: string }) {
           <span key={i} style={{ "--h": `${h}px`, "--d": `${i * 90}ms` } as React.CSSProperties} />
         ))}
       </div>
+      <span className="state">{playing ? "playing" : "paused"}</span>
     </section>
   );
 }
