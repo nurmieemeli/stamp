@@ -37,9 +37,16 @@
   *,
   *::before,
   *::after {
+    /* A negative delay makes the browser treat the animation as already
+       finished before the first paint, so it settles straight on the end
+       keyframe — a delay of 0 (or a near-zero duration alone) can instead
+       leave elements stuck showing their *start* keyframe (e.g. opacity: 0
+       on a fade-in), which looks broken rather than simply "not animated". */
     animation-duration: 0.01ms !important;
+    animation-delay: -1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
 }
