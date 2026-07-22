@@ -27,6 +27,64 @@
   box-sizing: border-box;
 }
 
+/* ---- motion ----
+   Animation is used generously throughout this file. One rule here is what
+   makes that safe: prefers-reduced-motion exists so visitors who get motion
+   sickness, vertigo, or (rarely) seizures from on-screen motion can turn it
+   off at the OS level — it stays authoritative over everything below,
+   regardless of how much gets added here. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
 html,
 body {
   height: 100%;
@@ -103,6 +161,7 @@ select:focus-visible {
 .site-header nav a {
   text-decoration: none;
   color: var(--text-muted);
+  transition: color 0.15s ease;
 }
 
 .site-header nav a:hover {
@@ -135,6 +194,7 @@ select:focus-visible {
   letter-spacing: 0.02em;
   color: var(--text-muted);
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 
 .site-footer .wordmark::before {
@@ -145,6 +205,7 @@ select:focus-visible {
 .site-footer .site-footer-meta a {
   color: var(--text-faint);
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 
 .site-footer .site-footer-meta a:hover {
@@ -177,6 +238,7 @@ select:focus-visible {
   border: 1px solid var(--line);
   padding: 10px 11px;
   border-radius: 0;
+  transition: border-color 0.15s ease;
 }
 
 .field textarea {
@@ -219,6 +281,7 @@ select:focus-visible {
   font-size: 0.75rem;
   color: #e26a5c;
   margin: -10px 0 18px;
+  animation: fade-in-up 0.25s ease-out both;
 }
 
 .field-tight {
@@ -247,10 +310,16 @@ select:focus-visible {
   border: 1px solid var(--accent);
   background: var(--accent);
   color: var(--accent-ink);
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.button:hover {
+.button:not(:disabled):hover {
   opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.button:not(:disabled):active {
+  transform: translateY(0) scale(0.97);
 }
 
 .button:disabled {
@@ -262,11 +331,17 @@ select:focus-visible {
   background: transparent;
   color: var(--text);
   border: 1px solid var(--line);
+  transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
-.button-ghost:hover {
+.button-ghost:not(:disabled):hover {
   border-color: var(--accent);
   color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.button-ghost:not(:disabled):active {
+  transform: translateY(0) scale(0.97);
 }
 
 .button-small {
@@ -292,6 +367,7 @@ select:focus-visible {
   background: var(--surface);
   border: 1px solid var(--line);
   padding: clamp(24px, 5vw, 36px);
+  animation: pop-in 0.35s ease-out both;
 }
 
 .auth-card h1 {
@@ -335,6 +411,7 @@ select:focus-visible {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);
+  animation: fade-in-up 0.5s ease-out both;
 }
 
 .hero h1 {
@@ -345,6 +422,8 @@ select:focus-visible {
   margin: 0 0 20px;
   text-wrap: balance;
   max-width: 16ch;
+  animation: fade-in-up 0.5s ease-out both;
+  animation-delay: 60ms;
 }
 
 .hero p {
@@ -353,6 +432,8 @@ select:focus-visible {
   line-height: 1.7;
   color: var(--text-muted);
   margin: 0 0 32px;
+  animation: fade-in-up 0.5s ease-out both;
+  animation-delay: 120ms;
 }
 
 .hero .actions {
@@ -360,6 +441,8 @@ select:focus-visible {
   gap: 12px;
   align-items: stretch;
   flex-wrap: wrap;
+  animation: fade-in-up 0.5s ease-out both;
+  animation-delay: 180ms;
 }
 
 .hero .actions .claim {
@@ -401,6 +484,27 @@ select:focus-visible {
 .feature-grid > div {
   background: var(--surface);
   padding: 26px 22px;
+  animation: fade-in-up 0.45s ease-out both;
+}
+
+.feature-grid > div:nth-child(1) {
+  animation-delay: 80ms;
+}
+
+.feature-grid > div:nth-child(2) {
+  animation-delay: 140ms;
+}
+
+.feature-grid > div:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+.feature-grid > div:nth-child(4) {
+  animation-delay: 260ms;
+}
+
+.feature-grid > div:nth-child(5) {
+  animation-delay: 320ms;
 }
 
 .feature-grid .n {
@@ -446,6 +550,7 @@ select:focus-visible {
   border: 1px solid var(--line);
   padding: clamp(20px, 3vw, 28px);
   margin-bottom: 24px;
+  animation: fade-in-up 0.35s ease-out both;
 }
 
 .panel-title {
@@ -563,6 +668,11 @@ select:focus-visible {
 
 .track-result:last-child {
   border-bottom: none;
+}
+
+.track-result {
+  animation: fade-in 0.2s ease-out both;
+  transition: background 0.15s ease;
 }
 
 .track-result:hover {
@@ -702,6 +812,11 @@ select:focus-visible {
   justify-content: center;
   position: relative;
   flex-shrink: 0;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.palette-swatch:hover {
+  transform: scale(1.12);
 }
 
 .palette-swatch .fill {
@@ -776,6 +891,7 @@ select:focus-visible {
   gap: 16px;
   padding: 12px 0;
   border-bottom: 1px solid var(--line);
+  animation: fade-in 0.3s ease-out both;
 }
 
 .invite-row:last-child {
@@ -818,6 +934,7 @@ select:focus-visible {
   border-bottom: 1px solid var(--line);
   text-decoration: none;
   color: var(--text);
+  animation: fade-in-up 0.3s ease-out both;
 }
 
 .admin-row:last-child {
@@ -828,6 +945,7 @@ select:focus-visible {
   font-weight: 700;
   font-size: 0.95rem;
   flex-shrink: 0;
+  transition: color 0.15s ease;
 }
 
 .admin-row-handle {
@@ -867,6 +985,7 @@ select:focus-visible {
   background: var(--surface);
   border: 1px solid var(--line);
   box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.6);
+  animation: fade-in-up 0.45s ease-out both;
 }
 
 .titlebar {
@@ -927,6 +1046,7 @@ select:focus-visible {
   background: var(--ok);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 20%, transparent);
   display: block;
+  animation: pulse-dot 1.6s ease-in-out infinite;
 }
 
 .window-body {
@@ -938,6 +1058,7 @@ select:focus-visible {
   align-items: flex-start;
   gap: 18px;
   margin: 0 0 18px;
+  animation: fade-in-up 0.4s ease-out both;
 }
 
 .device-frame {
@@ -992,6 +1113,8 @@ select:focus-visible {
   flex-wrap: wrap;
   gap: 8px;
   margin: 26px 0 4px;
+  animation: fade-in-up 0.4s ease-out both;
+  animation-delay: 180ms;
 }
 
 .stamp {
@@ -1004,6 +1127,11 @@ select:focus-visible {
   letter-spacing: 0.03em;
   color: var(--ok);
   background: var(--bg);
+  transition: transform 0.15s ease;
+}
+
+.stamp:hover {
+  transform: translateY(-1px);
 }
 
 .stamp::before {
@@ -1016,6 +1144,8 @@ select:focus-visible {
   line-height: 1.75;
   margin: 0 0 6px;
   max-width: 56ch;
+  animation: fade-in-up 0.4s ease-out both;
+  animation-delay: 60ms;
 }
 
 .spinning {
@@ -1027,6 +1157,8 @@ select:focus-visible {
   background: var(--bg);
   border: 1px solid var(--line-soft);
   border-left: 2px solid var(--accent);
+  animation: fade-in-up 0.4s ease-out both;
+  animation-delay: 100ms;
 }
 
 .spinning-art {
@@ -1110,11 +1242,8 @@ a.track-title:hover {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .bars.is-playing span {
-    animation: none;
-  }
-}
+/* Reduced-motion handling for this animation (and every other one in this
+   file) lives in the single universal rule near the top of this file. */
 
 .spinning .state {
   font-size: 0.6875rem;
@@ -1124,6 +1253,8 @@ a.track-title:hover {
 
 .index {
   margin: 26px 0 8px;
+  animation: fade-in-up 0.4s ease-out both;
+  animation-delay: 140ms;
 }
 
 .index-head {
@@ -1142,6 +1273,27 @@ a.track-title:hover {
   border-top: 1px solid var(--line-soft);
   text-decoration: none;
   font-size: 0.8125rem;
+  animation: fade-in-up 0.3s ease-out both;
+}
+
+.index-row:nth-of-type(1) {
+  animation-delay: 40ms;
+}
+
+.index-row:nth-of-type(2) {
+  animation-delay: 80ms;
+}
+
+.index-row:nth-of-type(3) {
+  animation-delay: 120ms;
+}
+
+.index-row:nth-of-type(4) {
+  animation-delay: 160ms;
+}
+
+.index-row:nth-of-type(5) {
+  animation-delay: 200ms;
 }
 
 .index-row:first-of-type {
@@ -1159,6 +1311,7 @@ a.track-title:hover {
   height: 15px;
   flex-shrink: 0;
   color: var(--text-faint);
+  transition: color 0.15s ease;
 }
 
 .platform-icon-mono {
@@ -1230,6 +1383,8 @@ a.track-title:hover {
   color: var(--accent-ink);
   font-size: 0.6875rem;
   letter-spacing: 0.02em;
+  animation: fade-in 0.4s ease-out both;
+  animation-delay: 220ms;
 }
 
 .statusbar a {
@@ -1252,12 +1407,6 @@ a.track-title:hover {
 @keyframes blink {
   50% {
     opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .statusbar .cursor {
-    animation: none;
   }
 }
 
