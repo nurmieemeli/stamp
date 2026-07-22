@@ -409,7 +409,6 @@ select:focus-visible {
 
 .hero {
   padding: clamp(48px, 11vw, 104px) 0 clamp(36px, 7vw, 68px);
-  border-bottom: 1px solid var(--line);
 }
 
 .hero .eyebrow {
