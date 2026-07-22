@@ -52,34 +52,6 @@ export default async function LandingPage() {
             </button>
           </form>
         </section>
-
-        <section className="feature-grid">
-          <div>
-            <span className="n">01</span>
-            <h3>Monospace, on purpose</h3>
-            <p>One typeface for everything — precise and legible, with nothing flashing or trailing your cursor.</p>
-          </div>
-          <div>
-            <span className="n">02</span>
-            <h3>Verified, not decorated</h3>
-            <p>Founding Member, Verified, Supporter — plain status tags the Stamp team grants, not a shelf of trophies.</p>
-          </div>
-          <div>
-            <span className="n">03</span>
-            <h3>A real link list</h3>
-            <p>Instagram, Bandcamp, GitHub, and the rest — numbered and listed, not stacked as a wall of icons.</p>
-          </div>
-          <div>
-            <span className="n">04</span>
-            <h3>Now playing, quietly</h3>
-            <p>Show what&rsquo;s on repeat. Nothing plays until someone taps it.</p>
-          </div>
-          <div>
-            <span className="n">05</span>
-            <h3>Five palettes, one you</h3>
-            <p>Amber, Nord, Dracula, Forest, or Paper for anyone who wants light. Your page, your colors.</p>
-          </div>
-        </section>
       </main>
     </>
   );
