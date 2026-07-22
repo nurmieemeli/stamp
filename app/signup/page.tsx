@@ -35,7 +35,7 @@ function SignupForm() {
           id="username"
           name="username"
           type="text"
-          placeholder="rhea"
+          placeholder="yourname"
           defaultValue={prefill}
           required
           minLength={3}
@@ -45,7 +45,7 @@ function SignupForm() {
       </div>
       <div className="field">
         <label htmlFor="displayName">Display name</label>
-        <input id="displayName" name="displayName" type="text" placeholder="Rhea Solano" autoComplete="name" />
+        <input id="displayName" name="displayName" type="text" placeholder="Your name" autoComplete="name" />
       </div>
       <div className="field">
         <label htmlFor="email">Email</label>
