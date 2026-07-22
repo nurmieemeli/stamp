@@ -52,7 +52,14 @@ export function ProfileView({ profile }: { profile: ProfileData }) {
           <p className="index-head">Links</p>
           {profile.links.length > 0 ? (
             profile.links.map((link, i) => (
-              <IndexLink key={link.id} n={i + 1} label={link.label} sub={link.sub} url={link.url} />
+              <IndexLink
+                key={link.id}
+                n={i + 1}
+                platform={link.platform}
+                label={link.label}
+                sub={link.sub}
+                url={link.url}
+              />
             ))
           ) : (
             <p className="index-empty">No links yet.</p>

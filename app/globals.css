@@ -965,6 +965,30 @@ select:focus-visible {
   flex-shrink: 0;
 }
 
+.platform-icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
+.platform-icon-mono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-size: 0.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.index-row:hover .platform-icon {
+  color: var(--accent);
+}
+
 .index-row .label-group {
   flex: 1;
   min-width: 0;

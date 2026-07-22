@@ -67,7 +67,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<Pa
     badges: profile.badges.map((pb) => ({ key: pb.badge.key, label: pb.badge.label })),
     links: profile.links.map((l) => {
       const url = resolveLinkUrl(l.platform, l.value);
-      return { id: l.id, label: getPlatformLabel(l.platform), sub: displayUrl(url), url };
+      return { id: l.id, platform: l.platform, label: getPlatformLabel(l.platform), sub: displayUrl(url), url };
     }),
   };
 

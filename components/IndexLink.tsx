@@ -1,10 +1,14 @@
+import { PlatformIcon } from "@/components/PlatformIcon";
+
 export function IndexLink({
   n,
+  platform,
   label,
   sub,
   url,
 }: {
   n: number;
+  platform: string;
   label: string;
   sub?: string;
   url: string;
@@ -12,6 +16,7 @@ export function IndexLink({
   return (
     <a className="index-row" href={url} target="_blank" rel="noopener noreferrer">
       <span className="n">{String(n).padStart(2, "0")}</span>
+      <PlatformIcon platform={platform} />
       <span className="label-group">
         <span className="label">{label}</span>
         {sub ? <span className="sub">{sub}</span> : null}

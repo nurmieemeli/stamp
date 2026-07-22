@@ -1,5 +1,6 @@
 export type ProfileLink = {
   id: string;
+  platform: string;
   label: string;
   sub: string;
   url: string;

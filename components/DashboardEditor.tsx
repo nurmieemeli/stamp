@@ -80,7 +80,7 @@ export function DashboardEditor({
         .filter((l) => l.value.trim())
         .map((l) => {
           const url = resolveLinkUrl(l.platform, l.value);
-          return { id: l.id, label: getPlatformLabel(l.platform), sub: displayUrl(url), url };
+          return { id: l.id, platform: l.platform, label: getPlatformLabel(l.platform), sub: displayUrl(url), url };
         }),
     }),
     [
